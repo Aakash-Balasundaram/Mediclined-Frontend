@@ -25,21 +25,21 @@ export default function Category() {
           </span>
         </div>
 
-        {/* Pharmacy */}
+        {/* Doctor */}
         <div
           className={`cursor-pointer flex-1 h-[76px] flex items-center justify-center text-[20px] ${
-            selected === "Pharmacy"
+            selected === "Doctor"
               ? "bg-white border-t-4 border-blue-500 border-b-0"
               : "bg-customSkyblue border border-gray-200"
           }`}
-          onClick={() => setSelected("Pharmacy")}
+          onClick={() => setSelected("Doctor")}
         >
           <span
             className={`${
-              selected === "Pharmacy" ? "text-black font-bold" : "text-gray-500"
+              selected === "Doctor" ? "text-black font-bold" : "text-gray-500"
             }`}
           >
-            Pharmacy
+            Doctor
           </span>
         </div>
 
