@@ -1,138 +1,469 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Calendar, Clock, User, Activity, Thermometer, History, ChevronRight, Menu } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor's Prescription Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
 
-const DoctorDashboard = () => {
-  return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="grid grid-cols-12 gap-6">
-        {/* Left Sidebar */}
-        <div className="col-span-2">
-          <Card className="h-full bg-indigo-500 text-white">
-            <CardContent className="p-4">
-              <div className="space-y-6">
-                <div className="text-xl font-bold p-4">
-                  DOCTOR PROFILE
+        body {
+            background: #f3f4f6;
+            padding: 2rem;
+            min-height: 100vh;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 0.7fr 1.3fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            padding: 1.5rem;
+        }
+
+        h2, h3 {
+            color: #111827;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Left Section */
+        .diagnosis-section {
+            background: #f9fafb;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .diagnosis-box {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        .tests-section {
+            background: #f9fafb;
+            padding: 1.25rem;
+            border-radius: 12px;
+        }
+
+        .test-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .test-item:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .add-test-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: white;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #4b5563;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .add-test-btn:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        /* Middle Section */
+        .prescription-section {
+            background: white;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-results {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            min-height: 120px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .med-item {
+            display: grid;
+            grid-template-columns: 1.5fr repeat(3, auto);
+            gap: 1.25rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            align-items: center;
+        }
+
+        .timing-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .timing-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .timing-btn.active {
+            background: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .checkout-btn:hover {
+            background: #4338ca;
+        }
+
+        /* Right Section - Enhanced Patient Info */
+        .patient-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .patient-header {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .patient-avatar {
+            width: 64px;
+            height: 64px;
+            background: #e5e7eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #6b7280;
+        }
+
+        .patient-details {
+            flex: 1;
+        }
+
+        .patient-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .patient-meta {
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .vitals-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .vital-box {
+            padding: 1.25rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .vital-box div {
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+
+        .vital-box strong {
+            font-size: 1.25rem;
+            color: #111827;
+        }
+
+        .vital-box.bp { background: #fef2f2; }
+        .vital-box.temp { background: #eef2ff; }
+        .vital-box.heart { background: #fffbeb; }
+        .vital-box.pulse { background: #ecfdf5; }
+
+        .patient-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .detail-item {
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .history-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+
+        .history-btn:hover {
+            background: #e5e7eb;
+        }
+
+        /* Queue Section */
+        .queue-section {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .queue-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .queue-item {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s;
+        }
+
+        .queue-item:hover {
+            background: #f3f4f6;
+        }
+
+        .queue-avatar {
+            width: 3rem;
+            height: 3rem;
+            background: #e5e7eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-grid">
+            <!-- Left Column -->
+            <div class="card">
+                <div class="diagnosis-section">
+                    <h3>Diagnosis</h3>
+                    <div class="diagnosis-box">Fever with body pain</div>
                 </div>
-                <nav className="space-y-4">
-                  <button className="w-full text-left p-3 rounded hover:bg-indigo-600 transition-colors">
-                    DOCTOR DASHBOARD
-                  </button>
-                  <button className="w-full text-left p-3 rounded hover:bg-indigo-600 transition-colors">
-                    Appointments
-                  </button>
-                  <button className="w-full text-left p-3 rounded hover:bg-indigo-600 transition-colors">
-                    Patient Records
-                  </button>
-                  <button className="w-full text-left p-3 rounded hover:bg-indigo-600 transition-colors">
-                    Settings
-                  </button>
-                </nav>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
-        {/* Main Content Area */}
-        <div className="col-span-7">
-          <div className="space-y-6">
-            {/* Search and Prescription Area */}
-            <Card className="bg-white">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4 mb-6">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Search patient prescriptions..."
-                        className="w-full p-3 pr-10 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
-                      <Search className="absolute right-3 top-3 text-gray-400" />
+                <div class="tests-section">
+                    <h3>Tests</h3>
+                    <div class="test-item">Complete Blood Count (CBC)</div>
+                    <div class="test-item">C-Reactive Protein</div>
+                    <button class="add-test-btn">+ Add Test</button>
+                </div>
+            </div>
+
+            <!-- Middle Column -->
+            <div class="prescription-section card">
+                <h2>PRESCRIPTION</h2>
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search medicines...">
+                    <div class="search-results">
+                        <!-- Search results will appear here -->
                     </div>
-                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Card className="bg-gray-50">
-                    <CardContent className="p-4">
-                      <h3 className="font-medium mb-2">Recent Prescriptions</h3>
-                      {/* Prescription list would go here */}
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-gray-50">
-                    <CardContent className="p-4">
-                      <h3 className="font-medium mb-2">Patient Notes</h3>
-                      {/* Patient notes would go here */}
-                    </CardContent>
-                  </Card>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Students Queue */}
-            <Card className="bg-indigo-600 text-white">
-              <CardHeader>
-                <CardTitle>STUDENTS QUEUE</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="grid grid-cols-3 gap-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center space-x-3 bg-indigo-700 p-3 rounded-lg">
-                      <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">
-                        <User className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <div className="font-medium">Student #{i}</div>
-                        <div className="text-sm text-indigo-200">Waiting</div>
-                      </div>
+                <div class="prescribed-meds">
+                    <div class="med-item">
+                        <span>Paracetamol 500mg</span>
+                        <div class="timing-selector">
+                            <button class="timing-btn active">M</button>
+                            <button class="timing-btn">A</button>
+                            <button class="timing-btn">N</button>
+                        </div>
+                        <select style="padding: 0.5rem; border-radius: 6px; border: 1px solid #e5e7eb;">
+                            <option>Before food</option>
+                            <option>After food</option>
+                        </select>
+                        <button style="padding: 0.5rem; border: none; background: none; cursor: pointer; color: #6b7280;">×</button>
                     </div>
-                  ))}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
 
-        {/* Right Sidebar */}
-        <div className="col-span-3">
-          <div className="space-y-6">
-            <Card className="bg-indigo-600 text-white">
-              <CardHeader>
-                <CardTitle>PATIENT INFORMATION</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center space-x-3 bg-indigo-700 p-3 rounded-lg">
-                  <Activity className="w-6 h-6" />
-                  <div>
-                    <div className="text-sm text-indigo-200">Blood Pressure</div>
-                    <div className="font-medium">120/80 mmHg</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3 bg-indigo-700 p-3 rounded-lg">
-                  <Thermometer className="w-6 h-6" />
-                  <div>
-                    <div className="text-sm text-indigo-200">Temperature</div>
-                    <div className="font-medium">98.6°F</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                <button class="checkout-btn">Complete Prescription</button>
+            </div>
 
-            <Card className="bg-indigo-400">
-              <CardContent className="p-4">
-                <button className="w-full flex items-center justify-between text-white">
-                  <div className="flex items-center space-x-2">
-                    <History className="w-5 h-5" />
-                    <span>VIEW PAST MEDICAL HISTORY</span>
-                  </div>
-                  <ChevronRight className="w-5 h-5" />
+            <!-- Right Column - Enhanced Patient Info -->
+            <div class="patient-info card">
+                <div class="patient-header">
+                    <div class="patient-avatar">JD</div>
+                    <div class="patient-details">
+                        <div class="patient-name">John Doe</div>
+                        <div class="patient-meta">32 years • Male</div>
+                        <div class="patient-meta">Patient ID: #12345</div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3>Vital Signs</h3>
+                    <div class="vitals-grid">
+                        <div class="vital-box bp">
+                            <div>Blood Pressure</div>
+                            <strong>120/80</strong>
+                        </div>
+                        <div class="vital-box temp">
+                            <div>Temperature</div>
+                            <strong>98.6°F</strong>
+                        </div>
+                        <div class="vital-box heart">
+                            <div>Heart Rate</div>
+                            <strong>72 bpm</strong>
+                        </div>
+                        <div class="vital-box pulse">
+                            <div>Pulse</div>
+                            <strong>80</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3>Patient Details</h3>
+                    <div class="patient-details-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Blood Group</div>
+                            <div class="detail-value">O+</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Weight</div>
+                            <div class="detail-value">75 kg</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Height</div>
+                            <div class="detail-value">175 cm</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">BMI</div>
+                            <div class="detail-value">24.5</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="history-btn">
+                    VIEW MEDICAL HISTORY
                 </button>
-              </CardContent>
-            </Card>
-          </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
-};
 
-export default DoctorDashboard;
+        <!-- Bottom Queue Section -->
+        <div class="queue-section">
+            <h3>Patient Queue</h3>
+            <div class="queue-grid">
+                <div class="queue-item">
+                    <div class="queue-avatar">1</div>
+                    <div>
+                        <div style="font-weight: 500;">Sarah Johnson</div>
+                        <small style="color: #6b7280;">Waiting • 10 min</small>
+                    </div>
+                </div>
+                <div class="queue-item">
+                    <div class="queue-avatar">2</div>
+                    <div>
+                        <div style="font-weight: 500;">Michael Smith</div>
+                        <small style="color: #6b7280;">Waiting • 15 min</small>
+                    </div>
+                </div>
+                <div class="queue-item">
+                    <div class="queue-avatar">3</div>
+                    <div>
+                        <div style="font-weight: 500;">Emma Davis</div>
+                        <small style="color: #6b7280;">Waiting • 20 min</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
