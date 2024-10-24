@@ -4,15 +4,22 @@ import { useEffect } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { useRouter } from "next/navigation";
 
+import EmailSender from "./components/EmailSender";
+
 export default function AdminHome() {
   const router = useRouter();
 
   useEffect(() => {
-    role = secureLocalStorage.getItem("role");
+    const role = secureLocalStorage.getItem("role");
     if (role != "A") {
       // navigate to unauthorised page..
-      router.push("/")
+      router.push("/403");
     }
   }, []);
-  return <div>Welcome to admin home</div>;
+  return (
+    <div>
+      Welcome to admin home
+      <EmailSender />
+    </div>
+  );
 }
