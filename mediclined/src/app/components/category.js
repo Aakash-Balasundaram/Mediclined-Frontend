@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
-export default function Category() {
-  const [selected, setSelected] = useState("Clinic");
+export default function Category({selected, setSelected}) {
   return (
     <div className="w-full h-[76px] flex items-center justify-center bg-customSkyblue">
       <div className="flex flex-row w-full">
