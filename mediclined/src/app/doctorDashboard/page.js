@@ -4,11 +4,20 @@ import MedicineSearch from "./components/MedicineSearch";
 import PrescriptionItem from "./components/PrescriptionItem";
 import Tests from "./components/TestComponent";
 import PatientData from "./components/PatientData";
+import WaitingQueue from "./components/WaitingQueue";
 
 function App() {
   const [diagnosis, setDiagnosis] = useState("");
   const [tests, setTests] = useState([]);
   const [medicines, setMedicines] = useState([]);
+
+  // Dummy patient queue
+  const patientQueue = [
+    { id: 1, name: "John Doe", age: 28, gender: "Male" },
+    { id: 2, name: "Jane Smith", age: 34, gender: "Female" },
+    { id: 3, name: "Mike Johnson", age: 45, gender: "Male" },
+    // Add more patients as needed
+  ];
 
   const dummyMedicines = [
     { id: 1, name: "Aspirin" },
@@ -102,56 +111,77 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      <div className="grid grid-cols-12 gap-4 flex-1 overflow-hidden">
-        <div className="col-span-3 bg-white shadow-md p-4 rounded-lg overflow-auto">
-          <h4 className="font-bold mb-4">Diagnosis</h4>
-          <input
-            type="text"
-            placeholder="Diagnosis"
-            value={diagnosis}
-            onChange={(e) => setDiagnosis(e.target.value)}
-            className="w-full border border-gray-300 p-2 rounded mb-4"
-          />
-          <h4 className="font-bold mb-4">Tests</h4>
-          <Tests
-            availableTests={availableTests}
-            onAddTest={(test) => setTests((prev) => [...prev, test])}
-          />
-          <ul className="mt-4 overflow-auto">
-            {tests.map((t, index) => (
-              <li key={index} className="border-b py-1">
-                {t}
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* Header Section */}
+      <header className="flex items-center p-4 bg-white shadow-md">
+        <img
+          src="/mediclined_logo-modified.png"
+          alt="Logo"
+          className="h-8 w-auto mr-2"
+        />
+        <h1 className="text-xl font-bold">MEDICLINED</h1>
+      </header>
 
-        <div className="col-span-6 bg-green-50 shadow-md p-4 rounded-lg overflow-auto">
-          <h4 className="font-bold mb-4">PRESCRIPTION</h4>
-          <MedicineSearch
-            medicines={dummyMedicines}
-            onSelect={handleMedicineSelect}
-          />
-          <ul className="mt-4 overflow-auto">
-            {medicines.map((m, index) => (
-              <PrescriptionItem
-                key={m.id}
-                medicine={m}
-                onDelete={() =>
-                  setMedicines((prev) => prev.filter((_, i) => i !== index))
-                }
+      <div className="flex flex-grow overflow-auto">
+        {/* Diagnosis and Prescription Container */}
+        <div className="flex flex-col flex-1 p-4 space-y-4">
+          <div className="flex flex-grow space-x-4">
+            {/* Diagnosis Section */}
+            <div className="bg-white shadow-md p-4 rounded-lg flex-1 flex flex-col">
+              <h4 className="font-bold mb-4">Diagnosis</h4>
+              <input
+                type="text"
+                placeholder="Diagnosis"
+                value={diagnosis}
+                onChange={(e) => setDiagnosis(e.target.value)}
+                className="w-full border border-gray-300 p-2 rounded mb-4"
               />
-            ))}
-          </ul>
-          <button
-            onClick={handleCheckout}
-            className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 text-sm mt-4"
-          >
-            Checkout
-          </button>
+              <h4 className="font-bold mb-4">Tests</h4>
+              <Tests
+                availableTests={availableTests}
+                onAddTest={(test) => setTests((prev) => [...prev, test])}
+              />
+              <ul className="mt-4 overflow-auto flex-grow">
+                {tests.map((t, index) => (
+                  <li key={index} className="border-b py-1">
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Prescription Section */}
+            <div className="bg-green-50 shadow-md p-4 rounded-lg flex-1 mx-4 flex flex-col">
+              <h4 className="font-bold mb-4">PRESCRIPTION</h4>
+              <MedicineSearch
+                medicines={dummyMedicines}
+                onSelect={handleMedicineSelect}
+              />
+              <ul className="mt-4 overflow-auto flex-grow">
+                {medicines.map((m, index) => (
+                  <PrescriptionItem
+                    key={m.id}
+                    medicine={m}
+                    onDelete={() =>
+                      setMedicines((prev) => prev.filter((_, i) => i !== index))
+                    }
+                  />
+                ))}
+              </ul>
+              <button
+                onClick={handleCheckout}
+                className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 text-sm mt-4"
+              >
+                Checkout
+              </button>
+            </div>
+          </div>
+
+          {/* Waiting Queue Section */}
+          <WaitingQueue patientQueue={patientQueue} />
         </div>
 
-        <div className="col-span-3 bg-white shadow-md p-4 rounded-lg overflow-auto">
+        {/* Patient Information */}
+        <div className="bg-white shadow-md p-4 rounded-lg w-1/4 h-full mt-4 mr-4 mb-4 overflow-y-auto max-h-[calc(100vh-98px)] flex-shrink-0">
           <h4 className="font-bold mb-4">PATIENT INFORMATION</h4>
           <PatientData
             patientDetails={patientData.details}

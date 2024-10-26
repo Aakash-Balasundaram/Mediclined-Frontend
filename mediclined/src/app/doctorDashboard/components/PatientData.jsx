@@ -14,7 +14,7 @@ const PatientData = ({
   medicalHistory,
 }) => {
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="p-6 bg-gray-100">
       {/* Patient Information Section */}
       <div className="mb-4 bg-white shadow-md p-4 rounded-lg">
         <p>
