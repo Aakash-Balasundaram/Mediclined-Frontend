@@ -49,6 +49,9 @@ export default function Login() {
       if (response.status == 200 && response.data.MSG) {
         secureLocalStorage.setItem("token", response.data.MSG.token);
         secureLocalStorage.setItem("role", response.data.MSG.role);
+        if(response.data.MSG.clinicID){
+          secureLocalStorage.setItem("clinicID", response.data.MSG.clinicID);
+        }
         if (response.data.MSG.role == "A") {
           router.push("/adminHome");
         }
