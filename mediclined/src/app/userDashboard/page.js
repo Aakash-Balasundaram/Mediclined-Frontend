@@ -52,7 +52,7 @@ const ProfileCard = ({ name, id }) => {
           <span className="font-medium">32 years</span>
         </div>
         <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-          <span className="text-gray-600">Blood</span>
+          <span className="text-gray-600">Blood Group</span>
           <span className="font-medium">O+</span>
         </div>
         <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
