@@ -7,6 +7,8 @@ const STUDENT_URL = BASE_URL + "/student";
 const FEEDBACK_URL = BASE_URL + "/feedback";
 const BILL_URL = BASE_URL + "/bill";
 const CLINIC_URL = BASE_URL + "/clinic";
+const MEDICINE_API_URL =
+  "https://clinicaltables.nlm.nih.gov/api/rxterms/v3/search";
 
 module.exports = {
   BASE_URL,
@@ -18,4 +20,5 @@ module.exports = {
   FEEDBACK_URL,
   BILL_URL,
   CLINIC_URL,
+  MEDICINE_API_URL,
 };

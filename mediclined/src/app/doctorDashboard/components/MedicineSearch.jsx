@@ -1,21 +1,23 @@
-import React, { useState } from "react";
+"use client"
+import React, { useState, useEffect, useRef } from "react";
 
-const MedicineSearch = ({ medicines, onSelect }) => {
+const MedicineSearch = ({ medicines, onSelect, callAPI, resetMedicines }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredMedicines, setFilteredMedicines] = useState([]);
+  const previousSearchTerm = useRef(""); // Reference to store last search term
 
-  const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-    if (term) {
-      const filtered = medicines.filter((med) =>
-        med.name.toLowerCase().includes(term)
-      );
-      setFilteredMedicines(filtered);
-    } else {
-      setFilteredMedicines([]);
+  useEffect(() => {
+    if (!searchTerm) {
+      resetMedicines(); 
+      previousSearchTerm.current = "";
+    } else if (searchTerm !== previousSearchTerm.current) {
+      const debounceTimeout = setTimeout(() => {
+        callAPI(searchTerm);
+        previousSearchTerm.current = searchTerm; // Update previous search term
+      }, 200);
+  
+      return () => clearTimeout(debounceTimeout);
     }
-  };
+  }, [searchTerm, callAPI, resetMedicines]);
 
   return (
     <div>
@@ -23,19 +25,18 @@ const MedicineSearch = ({ medicines, onSelect }) => {
         type="text"
         placeholder="Search medicines..."
         value={searchTerm}
-        onChange={handleSearch}
+        onChange={(e) => setSearchTerm(e.target.value)}
         className="w-full border border-gray-300 p-2 rounded mb-2"
       />
-      {filteredMedicines.length > 0 && (
+      {medicines.length > 0 && (
         <ul className="bg-white border border-gray-300 rounded mt-2 max-h-40 overflow-y-auto">
-          {filteredMedicines.map((medicine) => (
+          {medicines.map((medicine, index) => (
             <li
-              key={medicine.id}
+              key={index}
               className="p-2 hover:bg-gray-200 cursor-pointer"
               onClick={() => {
-                onSelect(medicine);
-                setSearchTerm("");
-                setFilteredMedicines([]);
+                onSelect(medicine.name, medicine.strengthsAndForms);
+                setSearchTerm(""); // Clear search after selection
               }}
             >
               {medicine.name}
