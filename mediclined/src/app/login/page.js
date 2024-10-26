@@ -61,8 +61,8 @@ export default function Login() {
   return (
     <div className="flex items-center justify-center h-screen w-screen bg-customWhite">
       <div className="flex flex-col sm:w-[350px] md:w-[500px] lg:w-[682px] h-[672px] justify-center items-center bg-white gap-4">
-        <div className="flex flex-row items-center justify-between w-[95%]">
-          <div className="flex flex-row items-center w-[296px] justify-between">
+        <div className="flex flex-row items-center justify-between w-[95%] mb-2">
+          <div className="flex flex-row items-center w-[272px] justify-between">
             <div>
               <Image
                 src="/mediclined_logo-modified.png"
@@ -72,7 +72,7 @@ export default function Login() {
                 className="mx-auto"
               />
             </div>
-            <div className="text-[42px] font-bold">Mediclined</div>
+            <div className="text-[38px] font-bold">Mediclined</div>
           </div>
           <div>
             <Homebutton />
@@ -84,10 +84,10 @@ export default function Login() {
           <div>
             <Category selected={category} setSelected={setCategory} />
           </div>
-          <div className="p-16">
+          <div className="p-14">
             <div className="flex flex-col justify-between gap-2">
-              <div className="text-[32px] font-semibold">Login</div>
-              <div className="text-[20px] w-[450px]">
+              <div className="text-[30px] font-semibold">Login</div>
+              <div className="text-[18px] w-[450px]">
                 Use your email to access your account and apply in the best
                 technology vacancies.
               </div>
@@ -126,7 +126,7 @@ export default function Login() {
                   <>
                     <label
                       htmlFor="email"
-                      className={`block text-[18px] mb-2 ${
+                      className={`block text-[18px] mb-0.5 ${
                         focusedInput === "email"
                           ? "text-blue-500"
                           : "text-black"
@@ -157,7 +157,7 @@ export default function Login() {
                   className={`block mt-4 text-[18px] ${
                     focusedInput === "password"
                       ? "text-blue-500"
-                      : "text-gray-500"
+                      : "border-black"
                   }`}
                 >
                   Password

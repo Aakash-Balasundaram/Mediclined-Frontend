@@ -1,404 +1,292 @@
-import { useState } from "react";
-import { FaClinicMedical } from "react-icons/fa";
-import { PiStudentBold } from "react-icons/pi";
-import { FaUserDoctor } from "react-icons/fa6";
-import { GiMedicines } from "react-icons/gi";
-import { Box, Typography, TextField, Button } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  Typography,
+  IconButton,
+  Tabs,
+  Tab,
+} from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-export default function Categories() {
-  const [expandedCategory, setExpandedCategory] = useState(null);
-  const [studentInput, setStudentInput] = useState("");
-  const [pharmacyInput, setPharmacyInput] = useState("");
-  const [clinicInput, setClinicInput] = useState("");
-  const [doctorInput, setDoctorInput] = useState("");
-  const [notifications, setNotifications] = useState({});
+const MyComponent = () => {
+  const [selectedTab, setSelectedTab] = useState("doctor");
 
-  const handleCategoryClick = (category) => {
-    setExpandedCategory(category === expandedCategory ? null : category);
-  };
-
-  const handleOperationClick = (category, operation, inputData) => {
-    setNotifications((prev) => ({
-      ...prev,
-      [category]: `Performed ${operation} with data: ${inputData}`
-    }));
-
-    // Reset the input field after operation
-    switch (category) {
-      case "student":
-        setStudentInput("");
-        break;
-      case "pharmacy":
-        setPharmacyInput("");
-        break;
-      case "clinic":
-        setClinicInput("");
-        break;
-      case "doctor":
-        setDoctorInput("");
-        break;
-      default:
-        break;
-    }
+  const handleChange = (event, newValue) => {
+    setSelectedTab(newValue);
   };
 
   return (
-    <div className="flex flex-row justify-between w-full h-full p-4">
-      <div className="flex flex-col w-1/2">
-        {/* Student Category */}
-        <div
-          className={`flex flex-row items-center p-4 cursor-pointer bg-customStudent transition-all w-full duration-300 ease-in-out ${
-            expandedCategory === "student" ? "h-auto" : "h-16"
-          }`}
-          onClick={() => handleCategoryClick("student")}
-        >
-          <div>
-            <PiStudentBold />
-          </div>
-          <div className="ml-2">Student</div>
-        </div>
-        {expandedCategory === "student" && (
-          <Box className="p-4 bg-gray-100 w-full transition-all duration-300 ease-in-out">
-            <Typography variant="h6" gutterBottom>
-              Student Operations
-            </Typography>
-            <TextField
-              label="Get All Students"
-              value={studentInput}
-              onChange={(e) => setStudentInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("student", "Get All Students", studentInput)}
-            >
-              Get Students
-            </Button>
-            <TextField
-              label="Add Multiple Students"
-              value={studentInput}
-              onChange={(e) => setStudentInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("student", "Add Multiple Students", studentInput)}
-            >
-              Add Students
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => handleOperationClick("student", "Delete Multiple Students", studentInput)}
-            >
-              Delete Students
-            </Button>
-            <TextField
-              label="Update Student Password"
-              value={studentInput}
-              onChange={(e) => setStudentInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("student", "Update Student Password", studentInput)}
-            >
-              Update Password
-            </Button>
-            <TextField
-              label="Reset Student Password"
-              value={studentInput}
-              onChange={(e) => setStudentInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("student", "Reset Student Password", studentInput)}
-            >
-              Reset Password
-            </Button>
-            {notifications.student && (
-              <Typography variant="body1" gutterBottom>
-                Notification: {notifications.student}
-              </Typography>
-            )}
-          </Box>
-        )}
+    <Box sx={{ width: "100%", px: 7 }}>
+      <Tabs
+        value={selectedTab}
+        onChange={handleChange}
+        aria-label="wrapped label tabs example"
+        sx={{ mb: 3 }}
+      >
+        <Tab sx={{ width: "25%", fontSize: "0.8rem" }} value="student" label="Student" />
+        <Tab sx={{ width: "25%", fontSize: "0.8rem" }} value="pharmacy" label="Pharmacy" />
+        <Tab sx={{ width: "25%", fontSize: "0.8rem" }} value="clinic" label="Clinic" />
+        <Tab sx={{ width: "25%", fontSize: "0.8rem" }} value="doctor" label="Doctor" />
+      </Tabs>
 
-        {/* Clinic Category */}
-        <div
-          className={`flex flex-row items-center p-4 cursor-pointer bg-customClinic transition-all w-full duration-300 ease-in-out ${
-            expandedCategory === "clinic" ? "h-auto" : "h-16"
-          }`}
-          onClick={() => handleCategoryClick("clinic")}
-        >
-          <div>
-            <FaClinicMedical />
-          </div>
-          <div className="ml-2">Clinic</div>
-        </div>
-        {expandedCategory === "clinic" && (
-          <Box className="p-4 bg-gray-100 w-full transition-all duration-300 ease-in-out">
-            <Typography variant="h6" gutterBottom>
-              Clinic Operations
-            </Typography>
-            <TextField
-              label="Create Clinic"
-              value={clinicInput}
-              onChange={(e) => setClinicInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("clinic", "Create Clinic", clinicInput)}
-            >
-              Create Clinic
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => handleOperationClick("clinic", "Get All Clinics", clinicInput)}
-            >
-              Get All Clinics
-            </Button>
-            <TextField
-              label="Get Clinic by ID"
-              value={clinicInput}
-              onChange={(e) => setClinicInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("clinic", "Get Clinic by ID", clinicInput)}
-            >
-              Get Clinic by ID
-            </Button>
-            <TextField
-              label="Update Clinic"
-              value={clinicInput}
-              onChange={(e) => setClinicInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("clinic", "Update Clinic", clinicInput)}
-            >
-              Update Clinic
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => handleOperationClick("clinic", "Delete Clinic", clinicInput)}
-            >
-              Delete Clinic
-            </Button>
-            {notifications.clinic && (
-              <Typography variant="body1" gutterBottom>
-                Notification: {notifications.clinic}
-              </Typography>
-            )}
-          </Box>
-        )}
-      </div>
-
-      <div className="flex flex-col w-1/2">
-        {/* Pharmacy Category */}
-        <div
-          className={`flex flex-row items-center p-4 cursor-pointer bg-customPharmacy transition-all w-full duration-300 ease-in-out ${
-            expandedCategory === "pharmacy" ? "h-auto" : "h-16"
-          }`}
-          onClick={() => handleCategoryClick("pharmacy")}
-        >
-          <div>
-            <GiMedicines />
-          </div>
-          <div className="ml-2">Pharmacy</div>
-        </div>
-        {expandedCategory === "pharmacy" && (
-          <Box className="p-4 bg-gray-100 w-full transition-all duration-300 ease-in-out">
-            <Typography variant="h6" gutterBottom>
-              Pharmacy Operations
-            </Typography>
-            <TextField
-              label="Add Product"
-              value={pharmacyInput}
-              onChange={(e) => setPharmacyInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("pharmacy", "Add Product", pharmacyInput)}
-            >
-              Add Product
-            </Button>
-            <TextField
-              label="Add Product to Pharmacy with Stock"
-              value={pharmacyInput}
-              onChange={(e) => setPharmacyInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("pharmacy", "Add Product with Stock", pharmacyInput)}
-            >
-              Add Product with Stock
-            </Button>
-            <TextField
-              label="Edit Product"
-              value={pharmacyInput}
-              onChange={(e) => setPharmacyInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("pharmacy", "Edit Product", pharmacyInput)}
-            >
-              Edit Product
-            </Button>
-            <TextField
-              label="Update Stock"
-              value={pharmacyInput}
-              onChange={(e) => setPharmacyInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("pharmacy", "Update Stock", pharmacyInput)}
-            >
-              Update Stock
-            </Button>
-            <TextField
-              label="Get All Products"
-              value={pharmacyInput}
-              onChange={(e) => setPharmacyInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => handleOperationClick("pharmacy", "Get All Products", pharmacyInput)}
-            >
-              Get All Products
-            </Button>
-            {notifications.pharmacy && (
-              <Typography variant="body1" gutterBottom>
-                Notification: {notifications.pharmacy}
-              </Typography>
-            )}
-          </Box>
-        )}
-
-        {/* Doctor Category */}
-        <div
-          className={`flex flex-row items-center p-4 cursor-pointer bg-customDoctor transition-all w-full duration-300 ease-in-out ${
-            expandedCategory === "doctor" ? "h-auto" : "h-16"
-          }`}
-          onClick={() => handleCategoryClick("doctor")}
-        >
-          <div>
-            <FaUserDoctor />
-          </div>
-          <div className="ml-2">Doctor</div>
-        </div>
-        {expandedCategory === "doctor" && (
-          <Box className="p-4 bg-gray-100 w-full transition-all duration-300 ease-in-out">
-            <Typography variant="h6" gutterBottom>
-              Doctor Operations
-            </Typography>
-            <TextField
-              label="Create Doctor"
-              value={doctorInput}
-              onChange={(e) => setDoctorInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("doctor", "Create Doctor", doctorInput)}
-            >
-              Create Doctor
-            </Button>
-            <TextField
-              label="Get All Doctors"
-              value={doctorInput}
-              onChange={(e) => setDoctorInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => handleOperationClick("doctor", "Get All Doctors", doctorInput)}
-            >
-              Get All Doctors
-            </Button>
-            <TextField
-              label="Get Doctor by ID"
-              value={doctorInput}
-              onChange={(e) => setDoctorInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("doctor", "Get Doctor by ID", doctorInput)}
-            >
-              Get Doctor by ID
-            </Button>
-            <TextField
-              label="Update Doctor"
-              value={doctorInput}
-              onChange={(e) => setDoctorInput(e.target.value)}
-              className="my-2"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOperationClick("doctor", "Update Doctor", doctorInput)}
-            >
-              Update Doctor
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => handleOperationClick("doctor", "Delete Doctor", doctorInput)}
-            >
-              Delete Doctor
-            </Button>
-            {notifications.doctor && (
-              <Typography variant="body1" gutterBottom>
-                Notification: {notifications.doctor}
-              </Typography>
-            )}
-          </Box>
-        )}
-      </div>
-    </div>
+      <Box sx={{ p: 3, bgcolor: "background.paper" }}>
+        {selectedTab === "doctor" && <Doctor />}
+        {/* Other components (Student, Pharmacy, Clinic) can be included here */}
+      </Box>
+    </Box>
   );
-}
+};
+
+const Doctor = () => {
+  const [doctor, setDoctor] = useState({
+    id: "",
+    name: "",
+    age: "",
+    email: "",
+    specialization: "",
+    qualification: "",
+  });
+  const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [doctors, setDoctors] = useState([]);
+  const [editingDoctor, setEditingDoctor] = useState(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setDoctor((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreate = () => {
+    setDoctors((prev) => [...prev, { ...doctor, id: String(prev.length + 1) }]);
+    console.log("Create doctor:", doctor);
+    setDoctor({ id: "", name: "", age: "", email: "", specialization: "", qualification: "" });
+  };
+
+  const handleGetAll = () => {
+    console.log("Get all doctors");
+    // Fetch all doctors from the database (mocked here)
+    setDoctors([
+      { id: "1", name: "Dr. John Doe", age: 45, email: "john@example.com", specialization: "Cardiology", qualification: "MD" },
+      { id: "2", name: "Dr. Jane Smith", age: 38, email: "jane@example.com", specialization: "Neurology", qualification: "PhD" },
+    ]);
+  };
+
+  const handleEdit = (doctor) => {
+    setEditingDoctor(doctor);
+  };
+
+  const handleUpdate = () => {
+    setDoctors((prev) =>
+      prev.map((doc) => (doc.id === editingDoctor.id ? editingDoctor : doc))
+    );
+    console.log("Update doctor:", editingDoctor);
+    setEditingDoctor(null);
+  };
+
+  const handleDelete = (doctorId) => {
+    setDoctors((prev) => prev.filter((doc) => doc.id !== doctorId));
+    console.log("Delete doctor:", doctorId);
+    setOpen(false);
+  };
+
+  const handleClickOpen = (doctorId) => {
+    setOpen(true);
+    setDoctor((prev) => ({ ...prev, id: doctorId }));
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredDoctors = doctors.filter((doc) =>
+    doc.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <Box border={"gray-500"} display="flex" justifyContent="space-between" sx={{ flexDirection: { xs: "column", md: "row" } }}>
+      <Box width={{ xs: "100%", md: "40%" }} sx={{ mb: 2 }}>
+        <Typography className="text-[28px]" variant="h6" sx={{ mb: 1 }}>Add Doctor Details</Typography>
+        <TextField
+          name="name"
+          label="Doctor Name"
+          value={doctor.name}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          sx={{ mb: 0.5 }}
+        />
+        <TextField
+          name="age"
+          label="Age"
+          value={doctor.age}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          sx={{ mb: 0.5 }}
+        />
+        <TextField
+          name="email"
+          label="Email"
+          value={doctor.email}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          sx={{ mb: 0.5 }}
+        />
+        <TextField
+          name="specialization"
+          label="Specialization"
+          value={doctor.specialization}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          sx={{ mb: 0.5 }}
+        />
+        <TextField
+          name="qualification"
+          label="Qualification"
+          value={doctor.qualification}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          sx={{ mb: 0.5 }}
+        />
+        <Button
+        className="mt-3"
+          variant="contained"
+          color="primary"
+          onClick={handleCreate}
+          sx={{ mb: 0.5 }}
+        >
+          Add Details
+        </Button>
+      </Box>
+      <Box width={{ xs: "100%", md: "58%" }} sx={{ mb: 2 }}>
+        <Typography variant="h6" className="text-[28px]" sx={{ fontSize: "1rem", mb: 2 }}>Doctor Details Management</Typography>
+        <TextField
+          name="search"
+          label="Search Doctor"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          fullWidth
+          margin="normal"
+          sx={{ mb: 0.5 }}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleGetAll}
+          sx={{ mb: 0.5 ,mt: 2}}
+        >
+          Get All Doctors
+        </Button>
+        <Box>
+          {filteredDoctors.map((doc) => (
+            <Box key={doc.id} display="flex" alignItems="center" sx={{ mb: 2 }}>
+              <Typography sx={{ flexGrow: 1 }}>{doc.name}</Typography>
+              <IconButton color="primary" onClick={() => handleEdit(doc)}>
+                <EditIcon />
+              </IconButton>
+              <IconButton color="secondary" onClick={() => handleClickOpen(doc.id)}>
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+          ))}
+        </Box>
+        {editingDoctor && (
+          <Box>
+            <Typography variant="h6" sx={{ fontSize: "1rem", mb: 2 }}>Edit Doctor</Typography>
+            <TextField
+              name="name"
+              label="Doctor Name"
+              value={editingDoctor.name}
+              onChange={(e) => setEditingDoctor({ ...editingDoctor, name: e.target.value })}
+              fullWidth
+              margin="normal"
+              sx={{ mb: 1 }}
+            />
+            <TextField
+              name="age"
+              label="Age"
+              value={editingDoctor.age}
+              onChange={(e) => setEditingDoctor({ ...editingDoctor, age: e.target.value })}
+              fullWidth
+              margin="normal"
+              sx={{ mb: 1 }}
+            />
+            <TextField
+              name="email"
+              label="Email"
+              value={editingDoctor.email}
+              onChange={(e) => setEditingDoctor({ ...editingDoctor, email: e.target.value })}
+              fullWidth
+              margin="normal"
+              sx={{ mb: 1 }}
+            />
+            <TextField
+              name="specialization"
+              label="Specialization"
+              value={editingDoctor.specialization}
+              onChange={(e) => setEditingDoctor({ ...editingDoctor, specialization: e.target.value })}
+              fullWidth
+              margin="normal"
+              sx={{ mb: 1 }}
+            />
+            <TextField
+              name="qualification"
+              label="Qualification"
+              value={editingDoctor.qualification}
+              onChange={(e) => setEditingDoctor({ ...editingDoctor, qualification: e.target.value })}
+              fullWidth
+              margin="normal"
+              sx={{ mb: 1 }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleUpdate}
+              sx={{ mb: 1 }}
+            >
+              Save Changes
+            </Button>
+          </Box>
+        )}
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Delete Doctor"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Are you sure you want to delete this doctor?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={() => handleDelete(doctor.id)} color="secondary" autoFocus>
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </Box>
+  );
+};
+
+export default MyComponent;
