@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { useRouter } from "next/navigation";
-import Head from "./components/header";
+import Head from "../header";
 import EmailSender from "./components/EmailSender";
 import Categories from "./components/categories";
 
