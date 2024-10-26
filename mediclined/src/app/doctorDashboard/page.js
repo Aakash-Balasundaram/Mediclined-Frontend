@@ -14,13 +14,20 @@ function App() {
   const [tests, setTests] = useState([]);
   const [medicines, setMedicines] = useState([]);
 
-  // Dummy patient queue
-  const patientQueue = [
+  // Patient queue state
+  const [patientQueue, setPatientQueue] = useState([
     { id: 1, name: "John Doe", age: 28, gender: "Male" },
     { id: 2, name: "Jane Smith", age: 34, gender: "Female" },
     { id: 3, name: "Mike Johnson", age: 45, gender: "Male" },
-    // Add more patients as needed
-  ];
+  ]);
+
+  // Function to handle patient rejection
+  const handleReject = (id) => {
+    setPatientQueue((prevQueue) =>
+      prevQueue.filter((patient) => patient.id !== id)
+    );
+  };
+
   const [selectedMedicines, setSelectedMedicines] = useState([]);
 
   const resetMedicines = () => {
@@ -37,7 +44,6 @@ function App() {
       const medicineNames = medicinesData[1];
       const strengthsAndForms = medicinesData[2]?.STRENGTHS_AND_FORMS || [];
 
-      // Mapping medicine names with their strengths and forms
       const formattedMedicines = medicineNames.map((name, index) => ({
         name,
         strengthsAndForms: strengthsAndForms[index] || [],
@@ -184,7 +190,7 @@ function App() {
             </div>
           </div>
           {/* Waiting Queue Section */}
-          <WaitingQueue patientQueue={patientQueue} />
+          <WaitingQueue patientQueue={patientQueue} onReject={handleReject} />
         </div>
 
         {/* Patient Information */}

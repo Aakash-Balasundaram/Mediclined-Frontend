@@ -63,19 +63,19 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center h-screen w-screen bg-customWhite">
-      <div className="flex flex-col sm:w-[350px] md:w-[500px] lg:w-[682px] h-[672px] justify-center items-center bg-white gap-4">
+      <div className="flex flex-col sm:w-[350px] md:w-[500px] lg:w-[628px] h-[476px] justify-center items-center bg-white gap-4 border border-gray-500">
         <div className="flex flex-row items-center justify-between w-[95%]">
-          <div className="flex flex-row items-center w-[296px] justify-between">
+          <div className="flex flex-row items-center w-[220px] justify-between">
             <div>
               <Image
                 src="/mediclined_logo-modified.png"
                 alt="hello"
-                width={60}
-                height={60}
+                width={50}
+                height={50}
                 className="mx-auto"
               />
             </div>
-            <div className="text-[42px] font-bold">Mediclined</div>
+            <div className="text-[30px] font-bold">Mediclined</div>
           </div>
           <div>
             <Homebutton />
@@ -87,16 +87,16 @@ export default function Login() {
           <div>
             <Category selected={category} setSelected={setCategory} />
           </div>
-          <div className="p-16">
+          <div className="p-10">
             <div className="flex flex-col justify-between gap-2">
-              <div className="text-[32px] font-semibold">Login</div>
-              <div className="text-[20px] w-[450px]">
+              <div className="text-[24px] font-semibold">Login</div>
+              <div className="text-[16px] w-[450px]">
                 Use your email to access your account and apply in the best
                 technology vacancies.
               </div>
             </div>
             <div className="flex flex-col gap-6">
-              <div className="mt-8">
+              <div className="mt-4">
                 {/* Email Input */}
                 {category == "Clinic" ? (
                   <>
@@ -129,7 +129,7 @@ export default function Login() {
                   <>
                     <label
                       htmlFor="email"
-                      className={`block text-[18px] mb-2 ${
+                      className={`block text-[18px] mb-0.5 ${
                         focusedInput === "email"
                           ? "text-blue-500"
                           : "text-black"
@@ -160,7 +160,7 @@ export default function Login() {
                   className={`block mt-4 text-[18px] ${
                     focusedInput === "password"
                       ? "text-blue-500"
-                      : "text-gray-500"
+                      : "border-black"
                   }`}
                 >
                   Password
