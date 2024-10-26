@@ -2,14 +2,27 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { STUDENT_URL } from "../../constants.js";
-import { Box, TextField, Button, Typography } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  FormControl,
+  FormControlLabel,
+  RadioGroup,
+  Radio,
+  FormLabel,
+} from "@mui/material";
+import secureLocalStorage from "react-secure-storage";
 
-const EmailSender = () => {
+const EmailSender = ({ fetchAll }) => {
   const [emailPattern, setEmailPattern] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [emailPreview, setEmailPreview] = useState([]);
+  const [clinicID, setClinicID] = useState("");
+  const [operation, setOperation] = useState("add"); // Set default to "add"
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,18 +45,36 @@ const EmailSender = () => {
     // Generate emails and send requests
     try {
       const emailPromises = [];
-
       for (let i = startNum; i <= endNum; i++) {
-        const email = emailPattern.replace(/\{n\}/g, String(i).padStart(2, "0"));
+        const email = emailPattern.replace(
+          /\{n\}/g,
+          String(i).padStart(2, "0")
+        );
         emailPromises.push(email);
       }
 
-      const res = await axios.post(STUDENT_URL + "/students", {
-        emails: emailPromises,
-        clinicID: 1,
-      });
-      console.log(res);
-      setStatusMessage("Emails sent successfully!");
+      const token = secureLocalStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      if (operation === "add") {
+        const res = await axios.post(
+          `${STUDENT_URL}/students`,
+          { emails: emailPromises, clinicID },
+          { headers }
+        );
+        console.log(res);
+        setStatusMessage("Emails sent successfully!");
+        fetchAll();
+      } else if (operation === "delete") {
+        // Using data property in config for DELETE request
+        const res = await axios.delete(`${STUDENT_URL}/students`, {
+          headers,
+          data: { emails: emailPromises },
+        });
+        console.log(res);
+        setStatusMessage("Students deleted successfully!");
+        fetchAll();
+      }
     } catch (error) {
       console.error(error);
       setStatusMessage("Error sending emails. Please try again.");
@@ -54,7 +85,12 @@ const EmailSender = () => {
     const startNum = parseInt(start, 10);
     const endNum = parseInt(end, 10);
 
-    if (!emailPattern || isNaN(startNum) || isNaN(endNum) || startNum > endNum) {
+    if (
+      !emailPattern ||
+      isNaN(startNum) ||
+      isNaN(endNum) ||
+      startNum > endNum
+    ) {
       setEmailPreview([]);
       return;
     }
@@ -90,9 +126,19 @@ const EmailSender = () => {
       }}
     >
       <Typography variant="h5" gutterBottom>
-        Send Student Emails
+        Batch CRUD operations
       </Typography>
       <form onSubmit={handleSubmit}>
+        <TextField
+          label="ClinicID"
+          variant="outlined"
+          fullWidth
+          value={clinicID}
+          onChange={(e) => setClinicID(e.target.value)}
+          placeholder="e.g. 12"
+          margin="normal"
+          required
+        />
         <TextField
           label="Email Pattern"
           variant="outlined"
@@ -124,6 +170,22 @@ const EmailSender = () => {
           margin="normal"
           required
         />
+        <FormControl>
+          <FormLabel id="functions">Functionality</FormLabel>
+          <RadioGroup
+            aria-labelledby="functions"
+            name="radio-buttons-group"
+            value={operation}
+            onChange={(e) => setOperation(e.target.value)}
+          >
+            <FormControlLabel value="add" control={<Radio />} label="Add" />
+            <FormControlLabel
+              value="delete"
+              control={<Radio />}
+              label="Delete"
+            />
+          </RadioGroup>
+        </FormControl>
         <Button
           type="submit"
           variant="contained"
@@ -131,7 +193,7 @@ const EmailSender = () => {
           fullWidth
           sx={{ mt: 2 }}
         >
-          Send Emails
+          Submit
         </Button>
       </form>
       {statusMessage && (
