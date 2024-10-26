@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 
-const PrescriptionItem = ({ medicine, onDelete }) => {
-  const [dosage, setDosage] = useState(medicine.dosage);
-  const [timing, setTiming] = useState(medicine.timing);
+const PrescriptionItem = ({ medicineObject, onDelete }) => {
+  const [dosage, setDosage] = useState(medicineObject.dosage);
+  const [timing, setTiming] = useState(medicineObject.timing);
+  const [strength, setStrength] = useState();
 
   const toggleTiming = (option) => {
     setTiming((prev) => ({
@@ -21,10 +22,10 @@ const PrescriptionItem = ({ medicine, onDelete }) => {
   return (
     <li className="border-b py-2 flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition duration-200">
       <div className="flex-grow">
-        <strong>{medicine.name}</strong>
+        <strong>{medicineObject.name}</strong>
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center space-x-2">
         <label className="mr-2 text-sm">Dosage (days):</label>
         <input
           type="number"
@@ -37,6 +38,21 @@ const PrescriptionItem = ({ medicine, onDelete }) => {
         />
       </div>
 
+      <div className="flex items-center space-x-2">
+        <label className="mr-2 text-sm">Strength:</label>
+        <select
+          value={strength}
+          onChange={(e) => setStrength(e.target.value)}
+          className="border border-gray-300 p-1 rounded mx-2"
+          aria-label="Select medicine strength"
+        >
+          {medicineObject.strengthAndForm.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="flex flex-col">
         <div className="flex space-x-4">
           {timeOptions.map(({ label, codes }) => (
