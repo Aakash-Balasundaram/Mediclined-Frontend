@@ -10,7 +10,8 @@ import {
   List,
   ListItem,
   ListItemText,
-  Paper
+  Paper,
+  Button
 } from '@mui/material';
 import Chart from 'chart.js/auto';
 
@@ -30,23 +31,26 @@ export default function Profile() {
   });
 
   const userData = {
-    email: "john.doe@example.com",
     name: "John Doe",
-    age: 35,
+    rollNumber: "R12345",
+    age: 19,
     bloodGroup: "O+",
     gender: "Male",
-    rollNumber: "R12345",
+    email: "john.doe@example.com",
     address: "123 Health Street, Medical City, MC 12345"
   };
 
   const medicalHistory = [
     { date: "2024-01-15", diagnosis: "Regular Checkup", prescription: "Vitamins" },
     { date: "2024-02-20", diagnosis: "Flu", prescription: "Antibiotics" },
-    { date: "2024-03-10", diagnosis: "Follow-up", prescription: "None" }
+    { date: "2024-03-10", diagnosis: "Follow-up", prescription: "None" },
+    { date: "2024-04-05", diagnosis: "Allergy", prescription: "Antihistamines" },
+    { date: "2024-05-12", diagnosis: "Cold", prescription: "Rest and Hydration" }
   ];
 
+  const [showAll, setShowAll] = useState(false);
+
   useEffect(() => {
-    // Functions to create charts remain the same as in previous version
     const createHeartRateChart = () => {
       const ctx = document.getElementById('heartRateChart');
       if (ctx) {
@@ -159,6 +163,11 @@ export default function Profile() {
     };
   }, [vitalSigns]);
 
+  // Handler for toggling medical history view
+  const toggleHistoryView = () => {
+    setShowAll(prev => !prev);
+  };
+
   return (
     <Box component="main" className="min-h-screen bg-gray-100 py-3">
         <div>
@@ -170,7 +179,6 @@ export default function Profile() {
         </Box>
 
         <Stack spacing={4} component="section">
-          {/* Top Section: General Details and Medical History */}
           <Box className="flex flex-col md:flex-row gap-4" component="section">
             {/* General Details Section */}
             <Paper elevation={3} className="flex-1 p-6">
@@ -193,11 +201,20 @@ export default function Profile() {
 
             {/* Medical History Section */}
             <Paper elevation={3} className="flex-1 p-6">
-              <Typography variant="h6" component="h2" className="mb-2 text-gray-700 font-semibold">
-                Medical History & Prescriptions
-              </Typography>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography variant="h6" component="h2" className="mb-2 text-gray-700 font-semibold">
+                  Medical History & Prescriptions
+                </Typography>
+                <Button
+                  variant="contained"
+                  color={showAll ? "secondary" : "primary"}
+                  onClick={toggleHistoryView}
+                >
+                  {showAll ? 'Show Less' : 'Show All'}
+                </Button>
+              </Box>
               <List className="divide-y divide-gray-200">
-                {medicalHistory.map((record, index) => (
+                {(showAll ? medicalHistory : medicalHistory.slice(-3)).map((record, index) => (
                   <ListItem key={index} component="div" className="py-3">
                     <ListItemText
                       primary={record.diagnosis}
@@ -220,18 +237,18 @@ export default function Profile() {
 
           {/* Critical Data Section */}
           <Paper elevation={3} className="p-6">
-            <Typography variant="h6" component="h2" className="mb-3 text-gray-700 font-semibold">
-              Critical Data
+            <Typography variant="h6" component="h2" className="mb-4 text-gray-700 font-semibold">
+              Vital Signs
             </Typography>
-            <Box className="flex flex-col md:flex-row gap-4">
-              <Box className="flex-1 h-64">
-                <canvas id="heartRateChart"></canvas>
+            <Box className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Box className="w-full h-64">
+                <canvas id="heartRateChart" />
               </Box>
-              <Box className="flex-1 h-64">
-                <canvas id="bpChart"></canvas>
+              <Box className="w-full h-64">
+                <canvas id="bpChart" />
               </Box>
-              <Box className="flex-1 h-64">
-                <canvas id="o2Chart"></canvas>
+              <Box className="w-full h-64">
+                <canvas id="o2Chart" />
               </Box>
             </Box>
           </Paper>
