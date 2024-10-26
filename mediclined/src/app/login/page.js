@@ -26,30 +26,40 @@ export default function Login() {
     e.preventDefault();
     try {
       let response;
-      if (category == "Clinic") {
+      let userId;
+
+      // Determine the request based on the selected category
+      if (category === "Clinic") {
         response = await axios.post(CLINIC_LOGIN_URL, {
           id: clinicID,
           password: password,
-          role: "D",
+          role: "C",
         });
-      } else if (category == "Doctor") {
+        userId = clinicID; // Save clinicID as the user identifier
+      } else if (category === "Doctor") {
         response = await axios.post(LOGIN_URL, {
           email: email,
           password: password,
           role: "D",
         });
-      } else if (category == "Admin") {
+        userId = email; // Use email as the identifier for Doctor
+      } else if (category === "Admin") {
         response = await axios.post(LOGIN_URL, {
           email: email,
           password: password,
           role: "A",
         });
+        userId = email; // Use email as the identifier for Admin
       }
-      console.log(response.data.MSG);
-      if (response.status == 200 && response.data.MSG) {
+
+      // Check response and store token and userId
+      if (response.status === 200 && response.data.MSG) {
         secureLocalStorage.setItem("token", response.data.MSG.token);
         secureLocalStorage.setItem("role", response.data.MSG.role);
-        if (response.data.MSG.role == "A") {
+        secureLocalStorage.setItem("userId", userId); // Store user identifier
+
+        // Redirect based on role
+        if (response.data.MSG.role === "A") {
           router.push("/adminHome");
         }
       }

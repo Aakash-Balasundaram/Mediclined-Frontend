@@ -14,7 +14,7 @@ function PatientCard({ patient, onReject }) {
         `Are you sure you want to remove ${patient.name} from the queue?`
       )
     ) {
-      onReject(patient.id); // Call the onReject function with the patient's ID
+      onReject(patient.email); // Use patient email instead of id
     }
   };
 
