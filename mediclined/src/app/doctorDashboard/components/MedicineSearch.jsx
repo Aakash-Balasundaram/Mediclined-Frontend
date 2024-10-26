@@ -1,15 +1,6 @@
 import React, { useState } from "react";
 
-const dummyMedicines = [
-  { id: 1, name: "Aspirin" },
-  { id: 2, name: "Ibuprofen" },
-  { id: 3, name: "Paracetamol" },
-  { id: 4, name: "Amoxicillin" },
-  { id: 5, name: "Metformin" },
-  // Add more dummy medicines as needed
-];
-
-const MedicineSearch = ({ onSelect }) => {
+const MedicineSearch = ({ medicines, onSelect }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredMedicines, setFilteredMedicines] = useState([]);
 
@@ -17,7 +8,7 @@ const MedicineSearch = ({ onSelect }) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
     if (term) {
-      const filtered = dummyMedicines.filter((med) =>
+      const filtered = medicines.filter((med) =>
         med.name.toLowerCase().includes(term)
       );
       setFilteredMedicines(filtered);

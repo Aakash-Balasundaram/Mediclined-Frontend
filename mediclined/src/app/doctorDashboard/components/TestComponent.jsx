@@ -1,16 +1,6 @@
 import React, { useState } from "react";
 
-const availableTests = [
-  "Blood Test",
-  "Urine Test",
-  "X-Ray",
-  "MRI",
-  "CT Scan",
-  "Blood Sugar Test",
-  "Cholesterol Test",
-];
-
-const Tests = ({ onAddTest }) => {
+const Tests = ({ availableTests, onAddTest }) => {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTests, setSelectedTests] = useState([]);

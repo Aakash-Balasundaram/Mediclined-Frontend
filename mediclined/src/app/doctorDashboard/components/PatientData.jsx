@@ -7,45 +7,12 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const PatientData = () => {
-  // Key health metrics with example values
-  const patientInfo = [
-    { title: "Blood Pressure", value: "120/80 mmHg", color: "#FFDDC1" },
-    { title: "Temperature", value: "98.6 °F", color: "#CFE2F3" },
-    { title: "Heart Rate", value: "75 bpm", color: "#D9EAD3" },
-    { title: "Oxygen Saturation", value: "98%", color: "#F9CB9C" },
-  ];
-
-  // Example previous test results
-  const previousTests = [
-    {
-      testName: "Blood Test",
-      result: "Normal",
-    },
-    {
-      testName: "X-Ray",
-      result: "Clear",
-    },
-    {
-      testName: "MRI",
-      result: "No abnormalities detected",
-    },
-  ];
-
-  // Example patient details
-  const patientDetails = {
-    name: "John Doe",
-    age: 30,
-    gender: "Male",
-  };
-
-  // Example medical history
-  const medicalHistory = [
-    "Hypertension diagnosed in 2018",
-    "Allergic to Penicillin",
-    "Previous surgeries: Appendectomy in 2015",
-  ];
-
+const PatientData = ({
+  patientDetails,
+  patientInfo,
+  previousTests,
+  medicalHistory,
+}) => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Patient Information Section */}
