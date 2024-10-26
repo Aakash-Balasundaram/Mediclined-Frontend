@@ -64,7 +64,7 @@ function App() {
     details: {
       name: "Jeevika",
       age: 20,
-      gender: "Male",
+      gender: "Female",
     },
     info: [
       { title: "Blood Pressure", value: "120/80 mmHg", color: "#FFDDC1" },
@@ -107,7 +107,7 @@ function App() {
       timing: { MN: "", AF: "", NT: "" },
       strengthAndForm,
     };
-    console.log(medicineObject)
+    console.log(medicineObject);
     const existingMedicine = selectedMedicines.find(
       (m) => m.name === medicineName && m.strengthAndForm === strengthAndForm
     );
@@ -137,7 +137,7 @@ function App() {
         <div className="flex flex-col flex-1 p-4 space-y-4">
           <div className="flex flex-grow space-x-4">
             {/* Diagnosis Section */}
-            <div className="bg-white shadow-md p-4 rounded-lg flex-1 flex flex-col">
+            <div className="bg-white shadow-md p-4 rounded-lg w-1/4 flex flex-col">
               <h4 className="font-bold mb-4">Diagnosis</h4>
               <input
                 type="text"
@@ -151,45 +151,38 @@ function App() {
                 availableTests={availableTests}
                 onAddTest={(test) => setTests((prev) => [...prev, test])}
               />
-              <ul className="mt-4 overflow-auto flex-grow">
-                {tests.map((t, index) => (
-                  <li key={index} className="border-b py-1">
-                    {t}
-                  </li>
-                ))}
-              </ul>
             </div>
 
-        {/* Prescription Section */}
-        <div className="col-span-6 bg-green-50 shadow-md p-4 rounded-lg overflow-auto flex-1 mx-4 flex flex-col">
-          <h4 className="font-bold mb-4">PRESCRIPTION</h4>
-          <MedicineSearch
-            medicines={medicines}
-            onSelect={handleMedicineSelect}
-            callAPI={searchMedicinesFunction}
-            resetMedicines={resetMedicines}
-          />
-          <ul className="mt-4 overflow-auto flex-grow">
-            {selectedMedicines.map((m, index) => (
-              <PrescriptionItem
-                key={m.id}
-                medicineObject={m}
-                onDelete={() =>
-                  setSelectedMedicines((prev) =>
-                    prev.filter((_, i) => i !== index)
-                  )
-                }
+            {/* Prescription Section */}
+            <div className="col-span-6 bg-green-50 shadow-md p-4 rounded-lg overflow-auto w-3/4 mx-4 flex flex-col">
+              <h4 className="font-bold mb-4">PRESCRIPTION</h4>
+              <MedicineSearch
+                medicines={medicines}
+                onSelect={handleMedicineSelect}
+                callAPI={searchMedicinesFunction}
+                resetMedicines={resetMedicines}
               />
-            ))}
-          </ul>
-          <button
-            onClick={handleCheckout}
-            className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 text-sm mt-4"
-          >
-            Checkout
-          </button>
-          </div>
+              <ul className="mt-4 overflow-auto flex-grow">
+                {selectedMedicines.map((m, index) => (
+                  <PrescriptionItem
+                    key={m.id}
+                    medicineObject={m}
+                    onDelete={() =>
+                      setSelectedMedicines((prev) =>
+                        prev.filter((_, i) => i !== index)
+                      )
+                    }
+                  />
+                ))}
+              </ul>
+              <button
+                onClick={handleCheckout}
+                className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 text-sm mt-4"
+              >
+                Checkout
+              </button>
             </div>
+          </div>
           {/* Waiting Queue Section */}
           <WaitingQueue patientQueue={patientQueue} />
         </div>
