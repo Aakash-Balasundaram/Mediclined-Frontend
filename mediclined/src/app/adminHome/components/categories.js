@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 
 import Doctor from "./doctorComponent";
+import Clinic from "./clinicComponent";
 
 const MyComponent = () => {
   const [selectedTab, setSelectedTab] = useState("doctor");
@@ -30,6 +31,7 @@ const MyComponent = () => {
 
       <Box sx={{ p: 3, bgcolor: "background.paper" }}>
         {selectedTab === "doctor" && <Doctor />}
+        {selectedTab === "clinic" && <Clinic />}
         {/* Other components (Student, Pharmacy, Clinic) can be included here */}
       </Box>
     </Box>
