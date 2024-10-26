@@ -24,7 +24,7 @@ export default function AdminHome() {
       <div className="flex flex-row m-4 items-center w-[296px] justify-between">
           <Head />
       </div>
-      <div>
+      <div className="flex items-center justify-center">
           <Categories />
       </div>
     </div>
