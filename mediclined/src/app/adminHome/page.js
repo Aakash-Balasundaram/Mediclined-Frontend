@@ -4,9 +4,9 @@ import { useEffect } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { useRouter } from "next/navigation";
 import Head from "./components/header";
-import Homeies from "../page";
-
+import Homies from "./components/dummy";
 import EmailSender from "./components/EmailSender";
+import Categories from "./components/categories";
 
 export default function AdminHome() {
   const router = useRouter();
@@ -24,9 +24,10 @@ export default function AdminHome() {
       <div className="flex flex-row m-4 items-center w-[296px] justify-between">
           <Head />
       </div>
-      <div>
-          <Homeies />
+      <div className="flex items-center justify-center">
+          <Categories />
       </div>
     </div>
   );
+
 }
