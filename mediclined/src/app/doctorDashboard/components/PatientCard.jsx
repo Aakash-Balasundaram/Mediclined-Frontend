@@ -2,13 +2,20 @@
 import React from "react";
 import { FaUser, FaVenusMars, FaCheck, FaTimes } from "react-icons/fa";
 
-function PatientCard({ patient }) {
+function PatientCard({ patient, onReject }) {
   const handleApprove = () => {
     console.log("Approve button clicked!");
   };
 
   const handleReject = () => {
-    console.log("Reject button clicked!");
+    // Confirmation before removal
+    if (
+      window.confirm(
+        `Are you sure you want to remove ${patient.name} from the queue?`
+      )
+    ) {
+      onReject(patient.id); // Call the onReject function with the patient's ID
+    }
   };
 
   return (
