@@ -1,4 +1,3 @@
-// ClinicDashboard.js
 "use client";
 import React, { useState } from "react";
 import { DashboardSidebar } from "./components/DashboardSidebar";
@@ -7,6 +6,7 @@ import { VitalsSection } from "./components/VitalsSection";
 import { MedicalLeaveSection } from "./components/MedicalLeaveSection";
 import { AlertSection } from "./components/AlertSection";
 import WaitingQueue from "./components/WaitingQueue";
+import { v4 as uuidv4 } from "uuid";
 
 const ClinicDashboard = () => {
   // Student/Patient Form State
@@ -102,6 +102,7 @@ const ClinicDashboard = () => {
 
   const handleCheckIn = () => {
     // Validation
+    console.log("Check-in clicked"); // Add this line
     if (!formData.name || !formData.age) {
       setError((prev) => ({
         ...prev,
@@ -112,7 +113,7 @@ const ClinicDashboard = () => {
 
     // Create new patient object with all form data
     const newPatient = {
-      id: patientQueue.length + 1,
+      id: uuidv4(), // Using uuid for a unique ID
       ...formData, // Spread the formData to include all fields
     };
 
@@ -237,7 +238,7 @@ const ClinicDashboard = () => {
           </div>
 
           {/* Right Sidebar */}
-          <div className="w-1/4 max-w-xs">
+          <div className="w-1/2">
             <div className="space-y-6">
               <AlertSection />
 

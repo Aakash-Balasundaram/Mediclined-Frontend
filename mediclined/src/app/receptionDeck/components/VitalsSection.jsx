@@ -1,3 +1,5 @@
+import { TextField, Button, MenuItem, Paper } from "@mui/material";
+
 export const VitalsSection = ({ formData, onChange, onCheckIn }) => {
   const VitalBox = ({
     label,
@@ -6,79 +8,142 @@ export const VitalsSection = ({ formData, onChange, onCheckIn }) => {
     onChange,
     placeholder,
     type = "text",
+    select = false,
     options = [],
-    bgColor,
+    bgcolor,
   }) => {
     return (
-      <div
-        className={`${bgColor} rounded-lg shadow-lg h-32 w-32 flex flex-col justify-center items-center p-4`}
-      >
-        <label className="block text-sm font-medium text-gray-600 mb-1">
-          {label}
-        </label>
-        {type === "select" ? (
-          <select
-            name={name}
-            value={value}
-            onChange={onChange}
-            className="text-center border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-          >
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <input
-            type={type}
-            name={name}
-            value={value}
-            onChange={onChange}
-            placeholder={placeholder}
-            className="text-center border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-          />
-        )}
+      <div className="flex flex-col items-center">
+        <Paper
+          elevation={3}
+          sx={{
+            height: 128,
+            width: 128,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            p: 2,
+            bgcolor,
+          }}
+        >
+          <label className="mb-2 text-sm font-medium text-gray-700">
+            {label}
+          </label>
+          {select ? (
+            <TextField
+              select
+              fullWidth
+              name={name}
+              value={value}
+              onChange={onChange}
+              size="small"
+              variant="standard"
+              sx={{
+                ".MuiInputBase-input": { textAlign: "center" },
+                "& .MuiInput-underline:before": { borderBottom: "none" },
+                "& .MuiInput-underline:hover:before": { borderBottom: "none" },
+                "& .MuiInput-underline:after": { borderBottom: "none" },
+              }}
+            >
+              {options.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          ) : (
+            <TextField
+              fullWidth
+              name={name}
+              value={value}
+              onChange={onChange}
+              placeholder={placeholder}
+              type={type}
+              size="small"
+              variant="standard"
+              sx={{
+                ".MuiInputBase-input": { textAlign: "center" },
+                "& .MuiInput-underline:before": { borderBottom: "none" },
+                "& .MuiInput-underline:hover:before": { borderBottom: "none" },
+                "& .MuiInput-underline:after": { borderBottom: "none" },
+              }}
+            />
+          )}
+        </Paper>
       </div>
     );
   };
-  
+
   return (
-    <div className="flex flex-wrap gap-4 justify-center items-center">
-      <VitalBox
-        label="Blood Pressure"
-        name="bloodPressure"
-        value={formData.bloodPressure}
-        onChange={onChange}
-        placeholder="e.g. 120/80"
-        bgColor="bg-red-100"
-      />
-      <VitalBox
-        label="Temperature"
-        name="temperature"
-        value={formData.temperature}
-        onChange={onChange}
-        placeholder="e.g. 98.6"
-        bgColor="bg-blue-100"
-      />
-      <VitalBox
-        label="Known Allergies"
-        name="knownAllergies"
-        value={formData.knownAllergies}
-        onChange={onChange}
-        type="select"
-        options={[
-          { value: "No", label: "No" },
-          { value: "Yes", label: "Yes" }
-        ]}
-        bgColor="bg-green-100"
-      />
-      <button
-        onClick={onCheckIn}
-        className="bg-blue-500 text-white rounded-lg shadow-lg h-32 w-32 flex items-center justify-center text-lg font-semibold hover:bg-blue-600 transition-colors"
-      >
-        Check-In
-      </button>
+    <div className="grid grid-cols-2 gap-6 justify-center items-center px-8">
+      <div>
+        <VitalBox
+          label="Blood Pressure"
+          name="bloodPressure"
+          value={formData.bloodPressure}
+          onChange={onChange}
+          placeholder="e.g. 120/80"
+          bgcolor="rgb(254, 226, 226)" // red-100
+        />
+      </div>
+
+      <div>
+        <VitalBox
+          label="Temperature"
+          name="temperature"
+          value={formData.temperature}
+          onChange={onChange}
+          placeholder="e.g. 98.6"
+          bgcolor="rgb(219, 234, 254)" // blue-100
+        />
+      </div>
+
+      <div>
+        <VitalBox
+          label="Known Allergies"
+          name="knownAllergies"
+          value={formData.knownAllergies}
+          onChange={onChange}
+          select
+          options={[
+            { value: "No", label: "No" },
+            { value: "Yes", label: "Yes" },
+          ]}
+          bgcolor="rgb(220, 252, 231)" // green-100
+        />
+      </div>
+
+      <div className="flex flex-col items-center">
+        <Paper
+          elevation={3}
+          sx={{
+            height: 128,
+            width: 128,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            bgcolor: "primary.main",
+            "&:hover": {
+              bgcolor: "primary.dark",
+            },
+            cursor: "pointer",
+          }}
+        >
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={onCheckIn}
+            sx={{
+              height: "100%",
+              boxShadow: "none",
+              "&:hover": { boxShadow: "none" },
+            }}
+          >
+            Check-In
+          </Button>
+        </Paper>
+      </div>
     </div>
   );
 };
