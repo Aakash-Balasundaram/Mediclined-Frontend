@@ -246,6 +246,7 @@ export default function Clinic() {
             >
               <div>
                 <Typography>University Name: {clinic.University_Name}</Typography>
+                <Typography>Clinic ID: {clinic.Clinic_ID}</Typography>
               </div>
               <div>
                 <IconButton

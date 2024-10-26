@@ -7,6 +7,8 @@ import {
 
 import Doctor from "./doctorComponent";
 import Clinic from "./clinicComponent";
+import Pharmacy from "./pharmacyComponent";
+import AdminStudentDashboard from "./studentComponent";
 
 const MyComponent = () => {
   const [selectedTab, setSelectedTab] = useState("doctor");
@@ -32,6 +34,8 @@ const MyComponent = () => {
       <Box sx={{ p: 3, bgcolor: "background.paper" }}>
         {selectedTab === "doctor" && <Doctor />}
         {selectedTab === "clinic" && <Clinic />}
+        {selectedTab === "pharmacy" && <Pharmacy />}
+        {selectedTab === "student" && <AdminStudentDashboard />}
         {/* Other components (Student, Pharmacy, Clinic) can be included here */}
       </Box>
     </Box>
