@@ -126,7 +126,7 @@ function App() {
         <div className="flex flex-col flex-1 p-4 space-y-4">
           <div className="flex flex-grow space-x-4">
             {/* Diagnosis Section */}
-            <div className="bg-white shadow-md p-4 rounded-lg flex-1 flex flex-col">
+            <div className="bg-white shadow-md p-4 rounded-lg w-1/3 flex flex-col">
               <h4 className="font-bold mb-4">Diagnosis</h4>
               <input
                 type="text"
@@ -140,17 +140,10 @@ function App() {
                 availableTests={availableTests}
                 onAddTest={(test) => setTests((prev) => [...prev, test])}
               />
-              <ul className="mt-4 overflow-auto flex-grow">
-                {tests.map((t, index) => (
-                  <li key={index} className="border-b py-1">
-                    {t}
-                  </li>
-                ))}
-              </ul>
             </div>
 
             {/* Prescription Section */}
-            <div className="bg-green-50 shadow-md p-4 rounded-lg flex-1 mx-4 flex flex-col">
+            <div className="bg-green-50 shadow-md p-4 rounded-lg w-2/3 mx-4 flex flex-col">
               <h4 className="font-bold mb-4">PRESCRIPTION</h4>
               <MedicineSearch
                 medicines={dummyMedicines}

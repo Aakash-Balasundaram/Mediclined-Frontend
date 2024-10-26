@@ -69,7 +69,7 @@ const PatientData = ({
             aria-controls="panel-medical-history-content"
             id="panel-medical-history-header"
           >
-            <Typography>Medical History</Typography>
+            <Typography>Past Prescriptions</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <div>
