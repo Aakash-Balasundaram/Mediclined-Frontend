@@ -19,7 +19,6 @@ function App() {
     { id: 1, name: "John Doe", age: 28, gender: "Male" },
     { id: 2, name: "Jane Smith", age: 34, gender: "Female" },
     { id: 3, name: "Mike Johnson", age: 45, gender: "Male" },
-    // Add more patients as needed
   ];
   const [selectedMedicines, setSelectedMedicines] = useState([]);
 
@@ -37,7 +36,6 @@ function App() {
       const medicineNames = medicinesData[1];
       const strengthsAndForms = medicinesData[2]?.STRENGTHS_AND_FORMS || [];
 
-      // Mapping medicine names with their strengths and forms
       const formattedMedicines = medicineNames.map((name, index) => ({
         name,
         strengthsAndForms: strengthsAndForms[index] || [],
