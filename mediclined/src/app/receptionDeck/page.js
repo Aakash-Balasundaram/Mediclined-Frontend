@@ -41,6 +41,13 @@ const ClinicDashboard = () => {
     { id: 3, name: "Mike Johnson", age: 45, gender: "Male" },
   ]);
 
+  // Function to handle patient rejection
+  const handleReject = (id) => {
+    setPatientQueue((prevQueue) =>
+      prevQueue.filter((patient) => patient.id !== id)
+    );
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -342,7 +349,10 @@ const ClinicDashboard = () => {
               </div>
             </div>
             <div className="mt-2">
-              <WaitingQueue patientQueue={patientQueue} />
+              <WaitingQueue
+                patientQueue={patientQueue}
+                onReject={handleReject}
+              />
             </div>
           </div>
 
