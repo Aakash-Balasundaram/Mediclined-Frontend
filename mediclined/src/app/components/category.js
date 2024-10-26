@@ -2,11 +2,11 @@
 
 export default function Category({selected, setSelected}) {
   return (
-    <div className="w-full h-[76px] flex items-center justify-center bg-customSkyblue">
+    <div className="w-full h-[64px] flex items-center justify-center bg-customSkyblue">
       <div className="flex flex-row w-full">
         {/* Clinic */}
         <div
-          className={`cursor-pointer flex-1 h-[76px] flex items-center justify-center text-[20px] ${
+          className={`cursor-pointer flex-1 h-[64px] flex items-center justify-center text-[20px] ${
             selected === "Clinic"
               ? "bg-white border-t-4 border-blue-500 border-b-0"
               : "bg-customSkyblue border border-gray-200"
@@ -24,7 +24,7 @@ export default function Category({selected, setSelected}) {
 
         {/* Doctor */}
         <div
-          className={`cursor-pointer flex-1 h-[76px] flex items-center justify-center text-[20px] ${
+          className={`cursor-pointer flex-1 h-[64px] flex items-center justify-center text-[20px] ${
             selected === "Doctor"
               ? "bg-white border-t-4 border-blue-500 border-b-0"
               : "bg-customSkyblue border border-gray-200"
@@ -42,7 +42,7 @@ export default function Category({selected, setSelected}) {
 
         {/* Admin */}
         <div
-          className={`cursor-pointer flex-1 h-[76px] flex items-center justify-center text-[20px] ${
+          className={`cursor-pointer flex-1 h-[64px] flex items-center justify-center text-[20px] ${
             selected === "Admin"
               ? "bg-white border-t-4 border-blue-500 border-b-0"
               : "bg-customSkyblue border border-gray-200"

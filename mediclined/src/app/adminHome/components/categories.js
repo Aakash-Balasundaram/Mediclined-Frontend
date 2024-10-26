@@ -72,7 +72,7 @@ const Doctor = () => {
 
   const handleGetAll = () => {
     console.log("Get all doctors");
-    // Fetch all doctors from the database (mocked here)
+
     setDoctors([
       { id: "1", name: "Dr. John Doe", age: 45, email: "john@example.com", specialization: "Cardiology", qualification: "MD" },
       { id: "2", name: "Dr. Jane Smith", age: 38, email: "jane@example.com", specialization: "Neurology", qualification: "PhD" },

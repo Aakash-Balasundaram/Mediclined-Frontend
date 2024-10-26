@@ -16,7 +16,7 @@ export default function Homebutton() {
   return (
     <div>
       <button
-        className={`text-blue-500 w-[188px] h-[44px] text-[18px] font-bold bg-customSkyblue ${
+        className={`text-blue-500 w-[156px] h-[32px] text-[16px] font-bold bg-customSkyblue ${
           isClicked ? "opacity-50" : "opacity-100"
         } transition-opacity duration-150 ease-in-out`}
         onClick={handleClick}
