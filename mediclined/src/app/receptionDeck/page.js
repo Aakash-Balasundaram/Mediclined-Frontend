@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import WaitingQueue from "./components/WaitingQueue";
 
 const ClinicDashboard = () => {
   const [formData, setFormData] = useState({
@@ -12,7 +13,6 @@ const ClinicDashboard = () => {
     bloodPressure: "",
     temperature: "",
     knownAllergies: "No",
-    height: "",
   });
 
   const [leaveData, setLeaveData] = useState({
@@ -34,6 +34,13 @@ const ClinicDashboard = () => {
     { id: 3, date: "2024-10-10", diagnosis: "Allergic Reaction" },
   ];
 
+  // Patient queue state
+  const [patientQueue, setPatientQueue] = useState([
+    { id: 1, name: "John Doe", age: 28, gender: "Male" },
+    { id: 2, name: "Jane Smith", age: 34, gender: "Female" },
+    { id: 3, name: "Mike Johnson", age: 45, gender: "Male" },
+  ]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -48,6 +55,34 @@ const ClinicDashboard = () => {
     if (name === "rollNo") {
       setError((prev) => ({ ...prev, leaveDetails: "" }));
     }
+  };
+
+  const handleCheckIn = () => {
+    console.log("Check-in Data:", JSON.stringify(formData, null, 2));
+
+    // Create a new patient object from formData
+    const newPatient = {
+      id: patientQueue.length + 1, // Unique ID based on queue length
+      name: formData.name,
+      age: formData.age,
+      gender: formData.gender || "Not Specified",
+    };
+
+    // Add new patient to queue
+    setPatientQueue((prevQueue) => [...prevQueue, newPatient]);
+
+    // Clear the form data after check-in
+    setFormData({
+      rollNo: "",
+      name: "",
+      age: "",
+      hostel: "",
+      roomNo: "",
+      contactNumber: "",
+      bloodPressure: "",
+      temperature: "",
+      knownAllergies: "No",
+    });
   };
 
   const handleFetchPrescriptions = () => {
@@ -77,7 +112,6 @@ const ClinicDashboard = () => {
       age: "20",
       contactNumber: "1234567890",
       knownAllergies: "No",
-      height: "5'10",
     };
 
     setFormData((prev) => ({
@@ -98,7 +132,7 @@ const ClinicDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white shadow-sm p-4">
         <h1 className="text-xl font-bold text-gray-800">Clinic Dashboard</h1>
@@ -107,53 +141,54 @@ const ClinicDashboard = () => {
       {/* Main Content */}
       <div className="p-6">
         <div className="flex gap-6">
-          {/* Left Sidebar - Dashboard Options */}
-          <div className="w-1/4 max-w-xs">
-            <div className="bg-white rounded-lg shadow-sm p-4 h-[calc(100vh-8rem)]">
-              <h2 className="font-semibold text-gray-800 mb-4">
-                Dashboard Options
-              </h2>
-              <div className="space-y-2">
-                {["Overview", "Appointments", "Patients", "Reports"].map(
-                  (option) => (
-                    <button
-                      key={option}
-                      className="w-full text-left p-3 rounded-md hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
-                    >
-                      {option}
-                    </button>
-                  )
-                )}
+          <div className="flex flex-col">
+            <div className="flex gap-6">
+              {/* Left Sidebar - Dashboard Options */}
+              <div className="w-1/4 max-w-xs">
+                <div className="bg-white rounded-lg shadow-sm p-4 h-[calc(100vh-17rem)]">
+                  <h2 className="font-semibold text-gray-800 mb-4">
+                    Dashboard Options
+                  </h2>
+                  <div className="space-y-2">
+                    {["Overview", "Appointments", "Patients", "Reports"].map(
+                      (option) => (
+                        <button
+                          key={option}
+                          className="w-full text-left p-3 rounded-md hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
+                        >
+                          {option}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-
-          {/* Middle Section - Patient and Student Details */}
-          <div className="flex-1">
-            <div className="bg-white rounded-lg shadow-sm p-4 h-[calc(100vh-8rem)]">
-              <h2 className="font-semibold text-gray-800 mb-4">
-                Patient/Student Details
-              </h2>
-              <div className="flex gap-4">
-                {/* Student Details */}
-                <div className="w-1/2 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Roll No
-                    </label>
-                    <div className="flex flex-col gap-2">
+              {/* Middle Section - Patient and Student Details */}
+              <div className="flex-1">
+                <div className="bg-white rounded-lg shadow-sm p-4 h-[calc(100vh-17rem)]">
+                  <h2 className="font-semibold text-gray-800 mb-4">
+                    Patient/Student Details
+                  </h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Student Details */}
+                    <div className="space-y-4">
                       <div className="flex gap-2">
-                        <input
-                          type="text"
-                          name="rollNo"
-                          value={formData.rollNo}
-                          onChange={handleChange}
-                          className="flex-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          placeholder="Enter Roll No"
-                        />
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium text-gray-600 mb-1">
+                            Roll No
+                          </label>
+                          <input
+                            type="text"
+                            name="rollNo"
+                            value={formData.rollNo}
+                            onChange={handleChange}
+                            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Enter Roll No"
+                          />
+                        </div>
                         <button
                           onClick={handleFetchStudentDetails}
-                          className="bg-gray-100 text-gray-700 px-3 py-2 rounded-md hover:bg-gray-200 transition-colors"
+                          className="bg-gray-100 text-gray-700 px-3 py-2 rounded-md hover:bg-gray-200 transition-colors self-end"
                         >
                           Fetch
                         </button>
@@ -163,131 +198,151 @@ const ClinicDashboard = () => {
                           {error.studentDetails}
                         </span>
                       )}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Age
-                    </label>
-                    <input
-                      type="number"
-                      name="age"
-                      value={formData.age}
-                      onChange={handleChange}
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Hostel
-                    </label>
-                    <select
-                      name="hostel"
-                      value={formData.hostel}
-                      onChange={handleChange}
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">Select Hostel</option>
-                      <option value="Hostel A">Hostel A</option>
-                      <option value="Hostel B">Hostel B</option>
-                      <option value="Hostel C">Hostel C</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Room No
-                    </label>
-                    <input
-                      type="text"
-                      name="roomNo"
-                      value={formData.roomNo}
-                      onChange={handleChange}
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Contact Number
-                    </label>
-                    <input
-                      type="tel"
-                      name="contactNumber"
-                      value={formData.contactNumber}
-                      onChange={handleChange}
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                </div>
 
-                {/* Vitals Bento Boxes */}
-                <div className="w-1/2 flex flex-wrap gap-4">
-                  <div className="bg-red-100 rounded-lg shadow-lg h-32 w-32 flex flex-col justify-center items-center p-4">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Blood Pressure
-                    </label>
-                    <input
-                      type="text"
-                      name="bloodPressure"
-                      value={formData.bloodPressure}
-                      onChange={handleChange}
-                      placeholder="e.g. 120/80"
-                      className="text-center border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-                    />
-                  </div>
-                  <div className="bg-blue-100 rounded-lg shadow-lg h-32 w-32 flex flex-col justify-center items-center p-4">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Temperature
-                    </label>
-                    <input
-                      type="text"
-                      name="temperature"
-                      value={formData.temperature}
-                      onChange={handleChange}
-                      placeholder="e.g. 98.6"
-                      className="text-center border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-                    />
-                  </div>
-                  <div className="bg-green-100 rounded-lg shadow-lg h-32 w-32 flex flex-col justify-center items-center p-4">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Known Allergies
-                    </label>
-                    <select
-                      name="knownAllergies"
-                      value={formData.knownAllergies}
-                      onChange={handleChange}
-                      className="text-center border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-                    >
-                      <option value="No">No</option>
-                      <option value="Yes">Yes</option>
-                    </select>
-                  </div>
-                  <div className="bg-gray-100 rounded-lg shadow-lg h-32 w-32 flex flex-col justify-center items-center p-4">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Height
-                    </label>
-                    <input
-                      type="text"
-                      name="height"
-                      value={formData.height}
-                      onChange={handleChange}
-                      placeholder="e.g. 5'10"
-                      className="text-center border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-                    />
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600 mb-1">
+                          Name
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600 mb-1">
+                          Contact Number
+                        </label>
+                        <input
+                          type="tel"
+                          name="contactNumber"
+                          value={formData.contactNumber}
+                          onChange={handleChange}
+                          className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">
+                            Age
+                          </label>
+                          <input
+                            type="number"
+                            name="age"
+                            value={formData.age}
+                            onChange={handleChange}
+                            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">
+                            Gender
+                          </label>
+                          <select
+                            name="gender"
+                            value={formData.gender}
+                            onChange={handleChange}
+                            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            <option value="" disabled>
+                              Select Gender
+                            </option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">
+                            Hostel
+                          </label>
+                          <select
+                            name="hostel"
+                            value={formData.hostel}
+                            onChange={handleChange}
+                            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            <option value="">Select Hostel</option>
+                            <option value="Hostel A">Hostel A</option>
+                            <option value="Hostel B">Hostel B</option>
+                            <option value="Hostel C">Hostel C</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">
+                            Room No
+                          </label>
+                          <input
+                            type="text"
+                            name="roomNo"
+                            value={formData.roomNo}
+                            onChange={handleChange}
+                            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Vitals Bento Boxes and Check-In Button */}
+                    <div className="flex flex-wrap gap-4 justify-center items-center">
+                      <div className="bg-red-100 rounded-lg shadow-lg h-32 w-32 flex flex-col justify-center items-center p-4">
+                        <label className="block text-sm font-medium text-gray-600 mb-1">
+                          Blood Pressure
+                        </label>
+                        <input
+                          type="text"
+                          name="bloodPressure"
+                          value={formData.bloodPressure}
+                          onChange={handleChange}
+                          placeholder="e.g. 120/80"
+                          className="text-center border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+                        />
+                      </div>
+                      <div className="bg-blue-100 rounded-lg shadow-lg h-32 w-32 flex flex-col justify-center items-center p-4">
+                        <label className="block text-sm font-medium text-gray-600 mb-1">
+                          Temperature
+                        </label>
+                        <input
+                          type="text"
+                          name="temperature"
+                          value={formData.temperature}
+                          onChange={handleChange}
+                          placeholder="e.g. 98.6"
+                          className="text-center border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+                        />
+                      </div>
+                      <div className="bg-green-100 rounded-lg shadow-lg h-32 w-32 flex flex-col justify-center items-center p-4">
+                        <label className="block text-sm font-medium text-gray-600 mb-1">
+                          Known Allergies
+                        </label>
+                        <select
+                          name="knownAllergies"
+                          value={formData.knownAllergies}
+                          onChange={handleChange}
+                          className="text-center border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+                        >
+                          <option value="No">No</option>
+                          <option value="Yes">Yes</option>
+                        </select>
+                      </div>
+                      <button
+                        onClick={handleCheckIn}
+                        className="bg-blue-500 text-white rounded-lg shadow-lg h-32 w-32 flex items-center justify-center text-lg font-semibold hover:bg-blue-600 transition-colors"
+                      >
+                        Check-In
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
+            <div className="mt-2">
+              <WaitingQueue patientQueue={patientQueue} />
             </div>
           </div>
 
