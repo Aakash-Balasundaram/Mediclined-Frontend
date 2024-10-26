@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { DashboardSidebar } from "./components/DashboardSidebar";
 import { StudentDetailsForm } from "./components/StudentDetailsForm";
 import { VitalsSection } from "./components/VitalsSection";
@@ -7,6 +8,8 @@ import { MedicalLeaveSection } from "./components/MedicalLeaveSection";
 import { AlertSection } from "./components/AlertSection";
 import WaitingQueue from "./components/WaitingQueue";
 import { v4 as uuidv4 } from "uuid";
+import { STUDENT_URL, CLINIC_URL, PHARMACY_URL } from "../constants";
+import secureLocalStorage from "react-secure-storage";
 
 const ClinicDashboard = () => {
   // Student/Patient Form State
@@ -17,7 +20,7 @@ const ClinicDashboard = () => {
     gender: "",
     hostel: "",
     roomNo: "",
-    contactNumber: "",
+    email: "",
     bloodPressure: "",
     temperature: "",
     knownAllergies: "No",
@@ -31,11 +34,201 @@ const ClinicDashboard = () => {
     selectedPrescription: "",
   });
 
-  // Error State
+  const [clinicID, setClinicID] = useState(""); // Example clinicID
+  const [token, setToken] = useState("");
+  const [patientQueue, setPatientQueue] = useState([]);
+
   const [error, setError] = useState({
     studentDetails: "",
     leaveDetails: "",
+    queue: "",
   });
+
+  useEffect(() => {
+    const storedClinicID = secureLocalStorage.getItem("userId");
+    const storedToken = secureLocalStorage.getItem("token");
+    console.log("Stored Clinic ID:", storedClinicID); // Check what is being retrieved
+    console.log("Stored Token: ", storedToken);
+    if (storedClinicID) {
+      setClinicID(storedClinicID);
+    } else {
+      console.log("No Clinic ID found in local storage");
+    }
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.log("No token found in local storage");
+    }
+  }, []);
+
+  // Call fetchQueue whenever clinicID changes
+  useEffect(() => {
+    if (clinicID) {
+      console.log("fetchQueue executing with clinicID:", clinicID);
+      fetchQueue(clinicID);
+    }
+  }, [clinicID]);
+
+  const fetchQueue = async (clinicID) => {
+    if (!clinicID) {
+      setError((prev) => ({
+        ...prev,
+        queue: "Clinic ID is required to fetch the queue",
+      }));
+      return; // Exit early if no clinic ID is found
+    }
+
+    try {
+      const response = await axios.get(PHARMACY_URL + "/queue", {
+        params: { clinicID: clinicID },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Check if response contains data and set patientQueue as an array
+      const data = response.data.MSG[0]; // Assuming MSG returns an array
+      if (data) {
+        setPatientQueue(Array.isArray(data) ? data : [data]); // Ensure it's always an array
+      } else {
+        setPatientQueue([]); // Default to empty if no data
+      }
+
+      console.log("Response:", response.data);
+    } catch (error) {
+      setPatientQueue([]); // Reset to empty on error
+      if (error.response && error.response.status === 400) {
+        setError((prev) => ({
+          ...prev,
+          queue: error.response.data.ERR,
+        }));
+      } else {
+        setError((prev) => ({
+          ...prev,
+          queue: "Internal Server Error",
+        }));
+      }
+    }
+  };
+
+  const handleFetchStudentDetails = async () => {
+    if (!formData.rollNo.trim()) {
+      setError((prev) => ({
+        ...prev,
+        studentDetails: "Please enter a roll number",
+      }));
+      return;
+    }
+
+    try {
+      console.log("Fetching student details..."); // Confirm the function is triggered
+
+      const response = await axios.get(STUDENT_URL + "/rollno", {
+        params: { rollNo: formData.rollNo },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Response MSG data:", response.data.MSG[0]); // Log the response
+
+      if (response.status === 200) {
+        const { Email, Name, Age, Gender } = response.data.MSG[0];
+
+        // Map response fields to formData fields
+        setFormData((prev) => ({
+          ...prev,
+          email: Email, // Backend "Email" -> form "email"
+          name: Name, // Backend "Name" -> form "name"
+          age: Age, // Backend "Age" -> form "age"
+          gender: Gender, // Backend "Gender" -> form "gender"
+        }));
+      } else {
+        setError((prev) => ({
+          ...prev,
+          studentDetails:
+            response.data.ERR || "Failed to fetch student details",
+        }));
+      }
+    } catch (error) {
+      console.error("API Error:", error); // Log error details
+      setError((prev) => ({
+        ...prev,
+        studentDetails: "Failed to fetch student details",
+      }));
+    }
+  };
+
+  const handleReject = async (email) => {
+    try {
+      await axios.delete(PHARMACY_URL + "/queue", {
+        params: { clinicID: clinicID, email: email }, // Pass both clinicID and student email
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPatientQueue((prev) =>
+        prev.filter((patient) => patient.email !== email)
+      );
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        setError((prev) => ({
+          ...prev,
+          queue: error.response.data.ERR,
+        }));
+      } else {
+        setError((prev) => ({
+          ...prev,
+          queue: "Failed to remove student from queue",
+        }));
+      }
+    }
+  };
+
+  const handleCheckIn = async () => {
+    // Ensure clinicID and email are set in formData
+    if (!clinicID || !formData.email) {
+      setError((prev) => ({
+        ...prev,
+        studentDetails: "Clinic ID and Email are required",
+      }));
+      return;
+    }
+
+    const queueNo = patientQueue.length + 1;
+
+    try {
+      const response = await axios.post(
+        PHARMACY_URL + "/queue",
+        {
+          clinicID: clinicID,
+          email: formData.email,
+          queueNo: queueNo,
+        },
+        { headers: { Authorization: `Bearer ${token}` } } // Clinic authorization
+      );
+      setPatientQueue((prev) => [...prev, response.data.MSG[0]]); // Assuming response contains new student details
+
+      // Reset form after successful addition
+      setFormData({
+        rollNo: "",
+        name: "",
+        age: "",
+        gender: "",
+        hostel: "",
+        roomNo: "",
+        email: "",
+        bloodPressure: "",
+        temperature: "",
+        knownAllergies: "No",
+      });
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        setError((prev) => ({
+          ...prev,
+          studentDetails: error.response.data.ERR,
+        }));
+      } else {
+        setError((prev) => ({
+          ...prev,
+          studentDetails: "Failed to add student to queue",
+        }));
+      }
+    }
+  };
 
   // Mock Data
   const mockPrescriptions = [
@@ -43,13 +236,6 @@ const ClinicDashboard = () => {
     { id: 2, date: "2024-10-15", diagnosis: "Fever" },
     { id: 3, date: "2024-10-10", diagnosis: "Allergic Reaction" },
   ];
-
-  // Patient Queue State
-  const [patientQueue, setPatientQueue] = useState([
-    { id: 1, name: "John Doe", age: 28, gender: "Male" },
-    { id: 2, name: "Jane Smith", age: 34, gender: "Female" },
-    { id: 3, name: "Mike Johnson", age: 45, gender: "Male" },
-  ]);
 
   // Handler Functions
   const handleStudentFormChange = (e) => {
@@ -66,73 +252,6 @@ const ClinicDashboard = () => {
     if (name === "rollNo") {
       setError((prev) => ({ ...prev, leaveDetails: "" }));
     }
-  };
-
-  const handleFetchStudentDetails = async () => {
-    if (!formData.rollNo.trim()) {
-      setError((prev) => ({
-        ...prev,
-        studentDetails: "Please enter a roll number",
-      }));
-      return;
-    }
-
-    try {
-      // Mock API call - replace with actual API call
-      const mockStudentData = {
-        name: "John Doe",
-        age: "20",
-        gender: "male",
-        contactNumber: "1234567890",
-        hostel: "Hostel A",
-        roomNo: "101",
-        knownAllergies: "No",
-      };
-      setFormData((prev) => ({
-        ...prev,
-        ...mockStudentData,
-      }));
-    } catch (error) {
-      setError((prev) => ({
-        ...prev,
-        studentDetails: "Failed to fetch student details",
-      }));
-    }
-  };
-
-  const handleCheckIn = () => {
-    // Validation
-    console.log("Check-in clicked"); // Add this line
-    if (!formData.name || !formData.age) {
-      setError((prev) => ({
-        ...prev,
-        studentDetails: "Please fill in required fields",
-      }));
-      return;
-    }
-
-    // Create new patient object with all form data
-    const newPatient = {
-      id: uuidv4(), // Using uuid for a unique ID
-      ...formData, // Spread the formData to include all fields
-    };
-
-    // Add to queue
-    setPatientQueue((prev) => [...prev, newPatient]);
-
-    // Reset form
-    setFormData({
-      rollNo: "",
-      name: "",
-      age: "",
-      gender: "",
-      hostel: "",
-      roomNo: "",
-      contactNumber: "",
-      bloodPressure: "",
-      temperature: "",
-      knownAllergies: "No",
-    });
   };
 
   const handleFetchPrescriptions = async () => {
@@ -188,10 +307,6 @@ const ClinicDashboard = () => {
     }
   };
 
-  const handleReject = (id) => {
-    setPatientQueue((prev) => prev.filter((patient) => patient.id !== id));
-  };
-
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white shadow-sm p-4">
@@ -232,7 +347,7 @@ const ClinicDashboard = () => {
             <div className="mt-2">
               <WaitingQueue
                 patientQueue={patientQueue}
-                onReject={handleReject}
+                onReject={(email) => handleReject(email)}
               />
             </div>
           </div>

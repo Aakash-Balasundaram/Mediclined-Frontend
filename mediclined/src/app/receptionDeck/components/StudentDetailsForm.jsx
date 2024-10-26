@@ -50,14 +50,15 @@ export const StudentDetailsForm = ({
           />
         </Grid>
 
+        {/* Change contact number field to email field */}
         <Grid item xs={12}>
           <TextField
             fullWidth
-            label="Contact Number"
-            name="contactNumber"
-            value={formData.contactNumber}
+            label="Email"
+            name="email" // Updated name to email
+            value={formData.email} // Updated value to formData.email
             onChange={onInputChange}
-            type="tel"
+            type="email" // Set type to email for validation
             size="small"
           />
         </Grid>
