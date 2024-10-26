@@ -42,7 +42,7 @@ export const VitalsSection = ({ formData, onChange, onCheckIn }) => {
       </div>
     );
   };
-
+  
   return (
     <div className="flex flex-wrap gap-4 justify-center items-center">
       <VitalBox
@@ -69,7 +69,7 @@ export const VitalsSection = ({ formData, onChange, onCheckIn }) => {
         type="select"
         options={[
           { value: "No", label: "No" },
-          { value: "Yes", label: "Yes" },
+          { value: "Yes", label: "Yes" }
         ]}
         bgColor="bg-green-100"
       />

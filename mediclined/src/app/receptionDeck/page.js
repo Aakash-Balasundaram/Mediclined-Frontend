@@ -110,12 +110,10 @@ const ClinicDashboard = () => {
       return;
     }
 
-    // Create new patient object
+    // Create new patient object with all form data
     const newPatient = {
       id: patientQueue.length + 1,
-      name: formData.name,
-      age: formData.age,
-      gender: formData.gender || "Not Specified",
+      ...formData, // Spread the formData to include all fields
     };
 
     // Add to queue

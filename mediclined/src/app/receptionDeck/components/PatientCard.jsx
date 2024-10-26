@@ -4,7 +4,7 @@ import { FaUser, FaVenusMars, FaCheck, FaTimes } from "react-icons/fa";
 
 function PatientCard({ patient, onReject }) {
   const handleApprove = () => {
-    console.log("Approve button clicked!");
+    console.log("Approved patient data:", patient); // Log entire patient data
   };
 
   const handleReject = () => {
