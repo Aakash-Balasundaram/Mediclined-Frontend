@@ -66,7 +66,7 @@ export default function Login() {
             <div>
               <Image
                 src="/mediclined_logo-modified.png"
-                alt="helllo"
+                alt="hello"
                 width={60}
                 height={60}
                 className="mx-auto"
