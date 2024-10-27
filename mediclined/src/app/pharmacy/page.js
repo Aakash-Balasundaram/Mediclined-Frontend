@@ -79,7 +79,6 @@ export default function Pharmacy() {
       ],
       status: 'Pending',
       total: 16.97,
-      paymentMethod: 'Credit Card'
     },
     {
       id: 'ORD-002',
@@ -90,7 +89,6 @@ export default function Pharmacy() {
       ],
       status: 'Completed',
       total: 12.99,
-      paymentMethod: 'Cash'
     }
   ]);
 
@@ -326,7 +324,6 @@ export default function Pharmacy() {
                     <TableCell>Date</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Total</TableCell>
-                    <TableCell>Payment Method</TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -338,7 +335,6 @@ export default function Pharmacy() {
                       <TableCell>{order.date}</TableCell>
                       <TableCell>{order.status}</TableCell>
                       <TableCell>${order.total.toFixed(2)}</TableCell>
-                      <TableCell>{order.paymentMethod}</TableCell>
                       <TableCell>
                         <Button variant="outlined" color="primary" onClick={() => generateBill(order)}>
                           Generate Bill
