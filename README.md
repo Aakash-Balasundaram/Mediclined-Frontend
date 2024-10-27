@@ -46,7 +46,7 @@ Check out the [Demo Video](YOUTUBE_LINK) for a quick walkthrough of the project 
 ### Backend Setup
 1. **Clone the Backend Repository**
    ```bash
-   git clone[ https://github.com/username/mediclined-backend.git](https://github.com/Thanus-Kumaar/Mediclined-Primary-Server.git)
+   git clone https://github.com/Thanus-Kumaar/Mediclined-Primary-Server.git
    cd Mediclined-Primary-Server
    ```
 
@@ -98,7 +98,7 @@ Experience the project live at [Live Demo Link](DEPLOYMENT_LINK).
 ---
 
 ## 🔮 Future Scope
-Some potential enhancements and new features we could add to further improve this project:
+Some potential enhancements and new features we could add to improve this project further:
 - **Feature 1:** Implement user authentication and authorization.
 - **Feature 2:** Add more data visualization options.
 - **Optimization:** Enhance performance through server-side rendering.
