@@ -1,4 +1,5 @@
 const BASE_URL = "http://localhost:5555/api";
+const MONGO_URL = "http://localhost:5556/api"
 const LOGIN_URL = BASE_URL + "/login";
 const CLINIC_LOGIN_URL = BASE_URL + "/clinicLogin";
 const PHARMACY_URL = BASE_URL + "/pharmacy";
@@ -12,6 +13,7 @@ const MEDICINE_API_URL =
 
 module.exports = {
   BASE_URL,
+  MONGO_URL,
   LOGIN_URL,
   CLINIC_LOGIN_URL,
   PHARMACY_URL,

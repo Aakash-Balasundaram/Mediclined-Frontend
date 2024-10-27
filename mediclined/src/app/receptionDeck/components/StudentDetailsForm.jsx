@@ -1,6 +1,7 @@
 import { TextField, Button, MenuItem, Grid } from "@mui/material";
 
 export const StudentDetailsForm = ({
+  switchValue,
   formData,
   error,
   onInputChange,
@@ -10,17 +11,31 @@ export const StudentDetailsForm = ({
     <div className="space-y-4">
       <Grid container spacing={2} alignItems="flex-end">
         <Grid item xs>
-          <TextField
-            fullWidth
-            label="Roll No"
-            name="rollNo"
-            value={formData.rollNo}
-            onChange={onInputChange}
-            error={!!error}
-            helperText={error}
-            placeholder="Enter Roll No"
-            size="small"
-          />
+          {switchValue == false ? (
+            <TextField
+              fullWidth
+              label="Roll No"
+              name="rollNo"
+              value={formData.rollNo}
+              onChange={onInputChange}
+              error={!!error}
+              helperText={error}
+              placeholder="Enter Roll No"
+              size="small"
+            />
+          ) : (
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              value={formData.email}
+              onChange={onInputChange}
+              error={!!error}
+              helperText={error}
+              placeholder="Enter Roll No"
+              size="small"
+            />
+          )}
         </Grid>
         <Grid item>
           <Button
@@ -52,15 +67,26 @@ export const StudentDetailsForm = ({
 
         {/* Change contact number field to email field */}
         <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Email"
-            name="email" // Updated name to email
-            value={formData.email} // Updated value to formData.email
-            onChange={onInputChange}
-            type="email" // Set type to email for validation
-            size="small"
-          />
+          {switchValue == false ? (
+            <TextField
+              fullWidth
+              label="Email"
+              name="email" // Updated name to email
+              value={formData.email} // Updated value to formData.email
+              onChange={onInputChange}
+              type="email" // Set type to email for validation
+              size="small"
+            />
+          ) : (
+            <TextField
+              fullWidth
+              label="Roll Number"
+              name="rollNo" // Updated name to email
+              value={formData.rollNo} // Updated value to formData.email
+              onChange={onInputChange}
+              size="small"
+            />
+          )}
         </Grid>
 
         <Grid item xs={6}>
@@ -90,7 +116,6 @@ export const StudentDetailsForm = ({
             </MenuItem>
             <MenuItem value="male">Male</MenuItem>
             <MenuItem value="female">Female</MenuItem>
-            <MenuItem value="other">Other</MenuItem>
           </TextField>
         </Grid>
 

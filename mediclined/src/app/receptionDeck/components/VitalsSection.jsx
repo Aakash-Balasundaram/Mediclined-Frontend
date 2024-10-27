@@ -1,6 +1,6 @@
 import { TextField, Button, MenuItem, Paper } from "@mui/material";
 
-export const VitalsSection = ({ formData, onChange, onCheckIn }) => {
+export const VitalsSection = ({ formData, onChange, onCheckIn, onUpdate }) => {
   const VitalBox = ({
     label,
     name,
@@ -100,18 +100,34 @@ export const VitalsSection = ({ formData, onChange, onCheckIn }) => {
       </div>
 
       <div>
-        <VitalBox
-          label="Known Allergies"
-          name="knownAllergies"
-          value={formData.knownAllergies}
-          onChange={onChange}
-          select
-          options={[
-            { value: "No", label: "No" },
-            { value: "Yes", label: "Yes" },
-          ]}
-          bgcolor="rgb(220, 252, 231)" // green-100
-        />
+        <Paper
+          elevation={3}
+          sx={{
+            height: 128,
+            width: 128,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            bgcolor: "primary.main",
+            "&:hover": {
+              bgcolor: "primary.dark",
+            },
+            cursor: "pointer",
+          }}
+        >
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={onUpdate}
+            sx={{
+              height: "100%",
+              boxShadow: "none",
+              "&:hover": { boxShadow: "none" },
+            }}
+          >
+            Update Details
+          </Button>
+        </Paper>
       </div>
 
       <div className="flex flex-col items-center">
