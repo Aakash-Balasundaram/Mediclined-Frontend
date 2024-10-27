@@ -53,41 +53,20 @@ export default function Pharmacy() {
   const [editingProduct, setEditingProduct] = useState(null);
   const billRef = useRef();
 
+  // New state for form inputs
   const [newProduct, setNewProduct] = useState({
     name: '',
     stock: '',
     price: ''
   });
 
+  // State for products
   const [products, setProducts] = useState([
     { id: 1, name: 'Paracetamol', stock: 500, price: 5.99, status: 'In Stock' },
     { id: 2, name: 'Amoxicillin', stock: 200, price: 12.99, status: 'Low Stock' },
     { id: 3, name: 'Aspirin', stock: 300, price: 4.99, status: 'In Stock' },
     { id: 4, name: 'Cetirizine', stock: 50, price: 8.99, status: 'Critical Stock' },
   ]);
-
-  const handleAddProduct = () => {
-    const stock = parseInt(newProduct.stock);
-    const price = parseFloat(newProduct.price);
-  
-    if (!newProduct.name || stock < 0 || price < 0) {
-      alert('Please provide valid product details.');
-      return;
-    }
-  
-    const newProductWithStatus = {
-      id: products.length + 1,
-      ...newProduct,
-      stock: stock,
-      price: price,
-      status: determineStatus(stock),
-    };
-  
-    setProducts([...products, newProductWithStatus]);
-    setNewProduct({ name: '', stock: '', price: '' });
-    setOpenAddProduct(false);
-  };
-  
 
   const [orders, setOrders] = useState([
     {
@@ -100,7 +79,6 @@ export default function Pharmacy() {
       ],
       status: 'Pending',
       total: 16.97,
-      paymentMethod: 'Credit Card'
     },
     {
       id: 'ORD-002',
@@ -111,54 +89,10 @@ export default function Pharmacy() {
       ],
       status: 'Completed',
       total: 12.99,
-      paymentMethod: 'Cash'
     }
   ]);
 
-  const [selectedPrescription, setSelectedPrescription] = useState(null);
-
-  const handleSelectPrescription = (prescription) => {
-    setSelectedPrescription(prescription);
-    setShowBillDialog(true);
-  };
-
-  const generatePrescriptionBill = () => {
-    if (!selectedPrescription) return;
-
-    setSelectedOrder(selectedPrescription);
-    setShowBillDialog(true);
-
-  const [prescriptions, setPrescriptions] = useState([
-    {
-      id: 'PRE-001',
-      doctor: 'Dr. Smith',
-      patient: 'John Doe',
-      medication: 'Ibuprofen',
-      dosage: '200mg twice daily',
-      duration: '5 days',
-      status: 'Pending'
-    },
-    {
-      id: 'PRE-002',
-      doctor: 'Dr. Johnson',
-      patient: 'Jane Smith',
-      medication: 'Amoxicillin',
-      dosage: '500mg thrice daily',
-      duration: '7 days',
-      status: 'Completed'
-    }
-  ]);
-
-  const [newPrescription, setNewPrescription] = useState({
-    doctor: '',
-    patient: '',
-    medication: '',
-    dosage: '',
-    duration: ''
-  });
-
-  const [openAddPrescription, setOpenAddPrescription] = useState(false);
-
+  // Handler for new product input changes
   const handleNewProductChange = (field) => (event) => {
     setNewProduct({
       ...newProduct,
@@ -166,6 +100,7 @@ export default function Pharmacy() {
     });
   };
 
+  // Handler for editing product input changes
   const handleEditProductChange = (field) => (event) => {
     setEditingProduct({
       ...editingProduct,
@@ -173,12 +108,14 @@ export default function Pharmacy() {
     });
   };
 
+  // Function to determine product status based on stock
   const determineStatus = (stock) => {
     if (stock > 300) return 'In Stock';
     if (stock > 100) return 'Low Stock';
     return 'Critical Stock';
   };
 
+  // Handler for adding new product
   const handleAddProduct = () => {
     const stock = parseInt(newProduct.stock);
     const newProductWithStatus = {
@@ -194,6 +131,7 @@ export default function Pharmacy() {
     setOpenAddProduct(false);
   };
 
+  // Handler for editing product
   const handleEditProduct = () => {
     const updatedProducts = products.map(product => {
       if (product.id === editingProduct.id) {
@@ -213,6 +151,7 @@ export default function Pharmacy() {
     setEditingProduct(null);
   };
 
+  // Function to open edit dialog
   const handleOpenEdit = (product) => {
     setEditingProduct(product);
     setOpenEditProduct(true);
@@ -250,37 +189,8 @@ export default function Pharmacy() {
     }
   };
 
-  const handleAddPrescription = () => {
-    const newPrescription = {
-      id: `PRE-${prescriptions.length + 1}`,
-      doctor: '',
-      patient: '',
-      medication: '',
-      dosage: '',
-      duration: '',
-      status: 'Pending'
-    };
-    
-    setPrescriptions([...prescriptions, newPrescription]);
-  };
-
-  const handlePrescriptionChange = (field) => (event) => {
-    setNewPrescription({
-      ...newPrescription,
-      [field]: event.target.value
-    });
-  };
-
-  const handleAddNewPrescription = () => {
-    const newPrescriptionWithStatus = {
-      ...newPrescription,
-      status: 'Pending'
-    };
-    
-    setPrescriptions([...prescriptions, newPrescriptionWithStatus]);
-    setNewPrescription({ doctor: '', patient: '', medication: '', dosage: '', duration: '' });
-    setOpenAddPrescription(false);
-  };
+  // Categories for dropdown
+  const categories = ['Pain Relief', 'Antibiotics', 'Allergy', 'Vitamins', 'First Aid'];
 
   const DashboardStats = () => (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -303,6 +213,7 @@ export default function Pharmacy() {
     </div>
   );
 
+  // Filter products based on search term
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.category.toLowerCase().includes(searchTerm.toLowerCase())
@@ -310,11 +221,12 @@ export default function Pharmacy() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div>
-        <Head />
-      </div>
+        <div>
+            <Head />
+        </div>
 
       <div className="p-6">
+        {/* Header section remains the same */}
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -345,9 +257,9 @@ export default function Pharmacy() {
         <Tabs value={activeTab} onChange={handleTabChange} className="mb-6">
           <Tab label="Inventory" />
           <Tab label="Orders" />
-          <Tab label="Prescriptions" />
         </Tabs>
 
+        {/* Inventory Tab */}
         {activeTab === 0 && (
           <div>
             <TextField
@@ -382,8 +294,9 @@ export default function Pharmacy() {
                       <TableCell>${product.price.toFixed(2)}</TableCell>
                       <TableCell>
                         <Chip label={product.status} color={
-                          product.status === 'In Stock' ? 'success' : 
-                          product.status === 'Low Stock' ? 'warning' : 'error'
+                          product.status === 'In Stock' ? 'success' :
+                          product.status === 'Low Stock' ? 'warning' :
+                          'error'
                         } />
                       </TableCell>
                       <TableCell>
@@ -394,7 +307,6 @@ export default function Pharmacy() {
                     </TableRow>
                   ))}
                 </TableBody>
-
               </Table>
             </TableContainer>
           </div>
@@ -478,12 +390,12 @@ export default function Pharmacy() {
         </DialogActions>
         </Dialog>
 
-                {/* Dialog for Editing Product */}
+        {/* Dialog for Editing Product */}
         <Dialog open={openEditProduct} onClose={() => setOpenEditProduct(false)}>
-        <DialogTitle>Edit Product</DialogTitle>
-        <DialogContent>
-            {editingProduct && (
-            <>
+<DialogTitle>Edit Product</DialogTitle>
+<DialogContent>
+    {editingProduct && (
+    <>
         <TextField
         label="Product Name"
         variant="outlined"
@@ -512,16 +424,16 @@ export default function Pharmacy() {
         />
     </>
     )}
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={() => setOpenEditProduct(false)} color="secondary">
-            Cancel
-            </Button>
-            <Button onClick={handleEditProduct} color="primary">
-            Update Product
-            </Button>
-        </DialogActions>
-        </Dialog>
+</DialogContent>
+<DialogActions>
+    <Button onClick={() => setOpenEditProduct(false)} color="secondary">
+    Cancel
+    </Button>
+    <Button onClick={handleEditProduct} color="primary">
+    Update Product
+    </Button>
+</DialogActions>
+</Dialog>
 
         {/* Dialog for Viewing and Downloading Bill */}
         <Dialog open={showBillDialog} onClose={() => setShowBillDialog(false)}>
@@ -558,80 +470,7 @@ export default function Pharmacy() {
             </Button>
           </DialogActions>
         </Dialog>
-
-        {activeTab === 2 && (
-        <div>
-          <TableContainer component={Paper} className="shadow-lg">
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Patient</TableCell>
-                  <TableCell>Doctor</TableCell>
-                  <TableCell>Diagnosis</TableCell>
-                  <TableCell>Tests</TableCell>
-                  <TableCell>Medicines</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {prescriptions.map((prescription) => (
-                  <TableRow key={prescription.id}>
-                    <TableCell>{prescription.patient}</TableCell>
-                    <TableCell>{prescription.doctor}</TableCell>
-                    <TableCell>{prescription.diagnosis}</TableCell>
-                    <TableCell>
-                      {prescription.tests.join(', ')}
-                    </TableCell>
-                    <TableCell>
-                      {prescription.medicines.length > 0 ? prescription.medicines[0].name : 'No medicines'}
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="outlined" color="primary" onClick={() => handleSelectPrescription(prescription)}>
-                        View Bill
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-      )}
-
-      {/* Dialog for Viewing and Downloading Prescription Bill */}
-      <Dialog open={showBillDialog} onClose={() => setShowBillDialog(false)}>
-        <DialogTitle>Prescription Bill for {selectedPrescription && selectedPrescription.patient}</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1">Patient: {selectedPrescription && selectedPrescription.patient}</Typography>
-          <Typography variant="body1">Doctor: {selectedPrescription && selectedPrescription.doctor}</Typography>
-          <Typography variant="body1">Diagnosis: {selectedPrescription && selectedPrescription.diagnosis}</Typography>
-          <Typography variant="body1">Tests:</Typography>
-          <ul>
-            {selectedPrescription && selectedPrescription.tests.map((test, index) => (
-              <li key={index}>{test}</li>
-            ))}
-          </ul>
-          <Typography variant="body1">Medicines:</Typography>
-          <ul>
-            {selectedPrescription && selectedPrescription.medicines.length > 0 ? 
-              selectedPrescription.medicines.map((medicine, index) => (
-                <li key={index}>
-                  {medicine.name}: {medicine.dosage}
-                </li>
-              )) : <li>No medicines prescribed</li>}
-          </ul>
-          <Typography variant="body1">Total: $0.00</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={downloadPDF} color="primary">
-            Download PDF
-          </Button>
-          <Button onClick={() => setShowBillDialog(false)} color="secondary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
       </div>
     </div>
   );
-}}
+}
