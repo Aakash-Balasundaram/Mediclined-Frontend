@@ -10,7 +10,7 @@ export default function Head() {
   };
 
   return (
-    <div className="flex flex-row items-center justify-between m-3">
+    <div className="flex flex-row items-center w-[97%] justify-between m-3">
       {/* Logo and Title */}
       <div className="flex flex-row items-center">
         <Image
