@@ -48,7 +48,7 @@ function PatientCard({ patient, onReject, handleApprove }) {
             <FaCheck size={12} />
           </button>
           <button
-            onClick={()=>handleReject}
+            onClick={()=>handleReject(patient.Email)}
             className="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
           >
             <FaTimes size={12} />

@@ -1,23 +1,26 @@
-import React, { useState } from "react";
+import React from 'react';
 
-const PrescriptionItem = ({ medicineObject, onDelete }) => {
-  const [dosage, setDosage] = useState(medicineObject.dosage);
-  const [timing, setTiming] = useState(medicineObject.timing);
-  const [strength, setStrength] = useState();
-
-  const toggleTiming = (option) => {
-    setTiming((prev) => ({
-      ...prev,
-      [option]: prev[option] ? "" : option,
-    }));
-  };
-
-  // Define time of day options
+const PrescriptionItem = ({ medicineObject, onUpdate, onDelete }) => {
+  // Time of day options configuration
   const timeOptions = [
-    { label: "Morning", codes: ["MB", "MA"] }, // BF and AF
+    { label: "Morning", codes: ["MB", "MA"] }, 
     { label: "Afternoon", codes: ["AB", "AA"] },
     { label: "Night", codes: ["NB", "NA"] },
   ];
+
+  // Handler for timing updates
+  const handleTimingToggle = (code) => {
+    const newTiming = {
+      ...medicineObject.timing,
+      [code]: medicineObject.timing[code] ? "" : code,
+    };
+    onUpdate(medicineObject.id, "timing", newTiming);
+  };
+
+  // Handler for selected strength and form change
+  const handleStrengthAndFormChange = (selectedOption) => {
+    onUpdate(medicineObject.id, "selectedStrength", selectedOption);
+  };
 
   return (
     <li className="border-b py-2 flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition duration-200">
@@ -29,8 +32,8 @@ const PrescriptionItem = ({ medicineObject, onDelete }) => {
         <label className="mr-2 text-sm">Dosage (days):</label>
         <input
           type="number"
-          value={dosage}
-          onChange={(e) => setDosage(e.target.value)}
+          value={medicineObject.dosage}
+          onChange={(e) => onUpdate(medicineObject.id, "dosage", e.target.value)}
           placeholder="Days"
           className="border border-gray-300 p-1 rounded w-20 mx-2"
           min="1"
@@ -41,11 +44,12 @@ const PrescriptionItem = ({ medicineObject, onDelete }) => {
       <div className="flex items-center space-x-2">
         <label className="mr-2 text-sm">Strength:</label>
         <select
-          value={strength}
-          onChange={(e) => setStrength(e.target.value)}
+          value={medicineObject.selectedStrength}
+          onChange={(e) => handleStrengthAndFormChange(e.target.value)}
           className="border border-gray-300 p-1 rounded mx-2"
           aria-label="Select medicine strength"
         >
+          <option value="">Select Strength</option>
           {medicineObject.strengthAndForm.map((option) => (
             <option key={option} value={option}>
               {option}
@@ -53,6 +57,7 @@ const PrescriptionItem = ({ medicineObject, onDelete }) => {
           ))}
         </select>
       </div>
+
       <div className="flex flex-col">
         <div className="flex space-x-4">
           {timeOptions.map(({ label, codes }) => (
@@ -66,9 +71,11 @@ const PrescriptionItem = ({ medicineObject, onDelete }) => {
                   <button
                     key={code}
                     className={`text-xs px-2 py-1 border rounded-md transition duration-200 ${
-                      timing[code] ? "bg-blue-600 text-white" : "bg-gray-200"
+                      medicineObject.timing[code] 
+                        ? "bg-blue-600 text-white" 
+                        : "bg-gray-200"
                     }`}
-                    onClick={() => toggleTiming(code)}
+                    onClick={() => handleTimingToggle(code)}
                     aria-label={`Select ${code}`}
                   >
                     {code}
