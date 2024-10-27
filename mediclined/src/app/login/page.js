@@ -77,7 +77,7 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center h-screen w-screen bg-customWhite">
-      <div className="flex flex-col sm:w-[350px] md:w-[500px] lg:w-[628px] h-[476px] justify-center items-center bg-white gap-4 border border-gray-500">
+      <div className="flex flex-col sm:w-[350px] md:w-[500px] lg:w-[628px] h-[476px] justify-center items-center bg-white gap-4">
         <div className="flex flex-row items-center justify-between w-[95%]">
           <div className="flex flex-row items-center w-[220px] justify-between">
             <div>
