@@ -8,6 +8,7 @@ import Link from "next/link";
 
 import { LOGIN_URL } from "../constants.js";
 import { useRouter } from "next/navigation";
+import secureLocalStorage from "react-secure-storage";
 
 export default function UserLogin() {
   const router = useRouter();
@@ -35,10 +36,13 @@ export default function UserLogin() {
           setStatusMessage(response.data.MSG);
           setError(true);
         } else if (response.data.MSG.role == "S") {
+          secureLocalStorage.setItem("token",response.data.MSG.token)
+          secureLocalStorage.setItem("role",response.data.MSG.role)
+          secureLocalStorage.setItem("email",response.data.MSG.email)
           setStatusMessage("Login successful!");
           setError(false);
           setTimeout(() => {}, 1000);
-          router.push("/user");
+          router.push("/userDashboard");
         } else {
           setStatusMessage(
             "Only students can login here. Visit other login pages."
