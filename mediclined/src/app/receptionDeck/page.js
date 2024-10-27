@@ -12,6 +12,7 @@ import { STUDENT_URL, CLINIC_URL, PHARMACY_URL, MONGO_URL } from "../constants";
 import secureLocalStorage from "react-secure-storage";
 import { useRouter } from "next/navigation";
 import { Switch } from "@mui/material";
+import Head from "../header";
 
 const ClinicDashboard = () => {
   const router = useRouter();
@@ -396,6 +397,9 @@ const ClinicDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <div>
+        <Head />
+      </div>
       <header className="bg-white shadow-sm p-4">
         <h1 className="text-xl font-bold text-gray-800">Clinic Dashboard</h1>
       </header>
