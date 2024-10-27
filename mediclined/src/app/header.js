@@ -20,7 +20,7 @@ export default function Head() {
           height={50}
           className="mx-auto"
         />
-        <div className="font-bold text-[32px] ml-2">Mediclined</div>
+        <div className="font-bold text-[30px] ml-2">Mediclined</div>
       </div>
 
       {/* MUI Logout button on the right end */}

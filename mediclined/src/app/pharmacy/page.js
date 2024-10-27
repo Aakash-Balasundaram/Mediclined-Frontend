@@ -2,9 +2,9 @@
 
 import Head from "../header";
 import { useState, useRef } from 'react';
-import { 
-  Card, 
-  CardContent, 
+import {
+  Card,
+  CardContent,
   Table,
   TableBody,
   TableCell,
@@ -23,18 +23,18 @@ import {
   Box,
   Typography,
   IconButton,
-  Alert,
   Chip,
-  Tooltip,
-  LinearProgress
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel
 } from '@mui/material';
-import { 
-  Add, 
-  Search, 
-  Download, 
-  Print, 
-  Inventory, 
-  ShoppingCart, 
+import {
+  Add,
+  Search,
+  Print,
+  Inventory,
+  ShoppingCart,
   LocalPharmacy,
   TrendingUp,
   Assignment,
@@ -46,21 +46,30 @@ import jsPDF from 'jspdf';
 export default function Pharmacy() {
   const [activeTab, setActiveTab] = useState(0);
   const [openAddProduct, setOpenAddProduct] = useState(false);
+  const [openEditProduct, setOpenEditProduct] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showBillDialog, setShowBillDialog] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
   const billRef = useRef();
 
-  // Sample data
-  const [products] = useState([
-    { id: 1, name: 'Paracetamol', stock: 500, price: 5.99, category: 'Pain Relief', status: 'In Stock' },
-    { id: 2, name: 'Amoxicillin', stock: 200, price: 12.99, category: 'Antibiotics', status: 'Low Stock' },
-    { id: 3, name: 'Aspirin', stock: 300, price: 4.99, category: 'Pain Relief', status: 'In Stock' },
-    { id: 4, name: 'Cetirizine', stock: 50, price: 8.99, category: 'Allergy', status: 'Critical Stock' },
+  // New state for form inputs
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    stock: '',
+    price: ''
+  });
+
+  // State for products
+  const [products, setProducts] = useState([
+    { id: 1, name: 'Paracetamol', stock: 500, price: 5.99, status: 'In Stock' },
+    { id: 2, name: 'Amoxicillin', stock: 200, price: 12.99, status: 'Low Stock' },
+    { id: 3, name: 'Aspirin', stock: 300, price: 4.99, status: 'In Stock' },
+    { id: 4, name: 'Cetirizine', stock: 50, price: 8.99, status: 'Critical Stock' },
   ]);
 
-  const [orders] = useState([
-    { 
+  const [orders, setOrders] = useState([
+    {
       id: 'ORD-001',
       customer: 'John Doe',
       date: '2024-10-27',
@@ -84,6 +93,71 @@ export default function Pharmacy() {
       paymentMethod: 'Cash'
     }
   ]);
+
+  // Handler for new product input changes
+  const handleNewProductChange = (field) => (event) => {
+    setNewProduct({
+      ...newProduct,
+      [field]: event.target.value
+    });
+  };
+
+  // Handler for editing product input changes
+  const handleEditProductChange = (field) => (event) => {
+    setEditingProduct({
+      ...editingProduct,
+      [field]: event.target.value
+    });
+  };
+
+  // Function to determine product status based on stock
+  const determineStatus = (stock) => {
+    if (stock > 300) return 'In Stock';
+    if (stock > 100) return 'Low Stock';
+    return 'Critical Stock';
+  };
+
+  // Handler for adding new product
+  const handleAddProduct = () => {
+    const stock = parseInt(newProduct.stock);
+    const newProductWithStatus = {
+      id: products.length + 1,
+      ...newProduct,
+      stock: stock,
+      price: parseFloat(newProduct.price),
+      status: determineStatus(stock)
+    };
+    
+    setProducts([...products, newProductWithStatus]);
+    setNewProduct({ name: '', stock: '', price: '' });
+    setOpenAddProduct(false);
+  };
+
+  // Handler for editing product
+  const handleEditProduct = () => {
+    const updatedProducts = products.map(product => {
+      if (product.id === editingProduct.id) {
+        const stock = parseInt(editingProduct.stock);
+        return {
+          ...editingProduct,
+          stock: stock,
+          price: parseFloat(editingProduct.price),
+          status: determineStatus(stock)
+        };
+      }
+      return product;
+    });
+    
+    setProducts(updatedProducts);
+    setOpenEditProduct(false);
+    setEditingProduct(null);
+  };
+
+  // Function to open edit dialog
+  const handleOpenEdit = (product) => {
+    setEditingProduct(product);
+    setOpenEditProduct(true);
+  };
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -117,7 +191,9 @@ export default function Pharmacy() {
     }
   };
 
-  // Dashboard Stats Component
+  // Categories for dropdown
+  const categories = ['Pain Relief', 'Antibiotics', 'Allergy', 'Vitamins', 'First Aid'];
+
   const DashboardStats = () => (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
       {[
@@ -139,14 +215,20 @@ export default function Pharmacy() {
     </div>
   );
 
+  // Filter products based on search term
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Head>
-        <title>Pharmacy Dashboard</title>
-      </Head>
+        <div>
+            <Head />
+        </div>
 
       <div className="p-6">
-        {/* Header */}
+        {/* Header section remains the same */}
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -172,325 +254,223 @@ export default function Pharmacy() {
           </div>
         </div>
 
-        {/* Dashboard Stats */}
         <DashboardStats />
 
-        {/* Tabs */}
-        <Box sx={{ 
-          borderBottom: 1, 
-          borderColor: 'divider',
-          mb: 3,
-          '& .MuiTab-root': {
-            minHeight: '64px',
-            fontSize: '1rem'
-          }
-        }}>
-          <Tabs 
-            value={activeTab} 
-            onChange={handleTabChange}
-            className="bg-white rounded-t-lg shadow-sm"
-          >
-            <Tab 
-              label="Inventory" 
-              icon={<Inventory />} 
-              iconPosition="start"
-              className="font-semibold"
-            />
-            <Tab 
-              label="Orders" 
-              icon={<ShoppingCart />} 
-              iconPosition="start"
-              className="font-semibold"
-            />
-          </Tabs>
-        </Box>
+        <Tabs value={activeTab} onChange={handleTabChange} className="mb-6">
+          <Tab label="Inventory" />
+          <Tab label="Orders" />
+        </Tabs>
 
         {/* Inventory Tab */}
         {activeTab === 0 && (
-          <div className="mt-4">
-            <Card className="shadow-lg">
-              <CardContent>
-                <div className="mb-6">
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    placeholder="Search products by name, category..."
-                    InputProps={{
-                      startAdornment: <Search className="mr-2 text-gray-400" />,
-                      className: "bg-white"
-                    }}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <TableContainer component={Paper} className="shadow-md">
-                  <Table>
-                    <TableHead className="bg-gray-50">
-                      <TableRow>
-                        <TableCell className="font-bold">Product Name</TableCell>
-                        <TableCell className="font-bold">Category</TableCell>
-                        <TableCell className="font-bold">Stock</TableCell>
-                        <TableCell className="font-bold">Status</TableCell>
-                        <TableCell className="font-bold">Price</TableCell>
-                        <TableCell className="font-bold">Actions</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {products.map((product) => (
-                        <TableRow 
-                          key={product.id}
-                          className="hover:bg-gray-50 transition-colors"
-                        >
-                          <TableCell className="font-medium">{product.name}</TableCell>
-                          <TableCell>
-                            <Chip 
-                              label={product.category}
-                              size="small"
-                              className="bg-blue-100 text-blue-700"
-                            />
-                          </TableCell>
-                          <TableCell>{product.stock}</TableCell>
-                          <TableCell>
-                            <Chip 
-                              label={product.status}
-                              size="small"
-                              className={
-                                product.status === 'In Stock' ? 'bg-green-100 text-green-700' :
-                                product.status === 'Low Stock' ? 'bg-orange-100 text-orange-700' :
-                                'bg-red-100 text-red-700'
-                              }
-                            />
-                          </TableCell>
-                          <TableCell>${product.price}</TableCell>
-                          <TableCell>
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              className="border-blue-500 text-blue-500 hover:bg-blue-50"
-                              onClick={() => setOpenAddProduct(true)}
-                            >
-                              Update Stock
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </CardContent>
-            </Card>
+          <div>
+            <TextField
+              variant="outlined"
+              placeholder="Search Products..."
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="mb-4 w-full"
+              InputProps={{
+                endAdornment: (
+                  <IconButton>
+                    <Search />
+                  </IconButton>
+                ),
+              }}
+            />
+            <TableContainer component={Paper} className="shadow-lg">
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Stock</TableCell>
+                    <TableCell>Price</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredProducts.map(product => (
+                    <TableRow key={product.id}>
+                      <TableCell>{product.name}</TableCell>
+                      <TableCell>{product.stock}</TableCell>
+                      <TableCell>${product.price.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Chip label={product.status} color={
+                          product.status === 'In Stock' ? 'success' :
+                          product.status === 'Low Stock' ? 'warning' :
+                          'error'
+                        } />
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="outlined" color="primary" onClick={() => handleOpenEdit(product)}>
+                          Edit
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </div>
         )}
 
         {/* Orders Tab */}
         {activeTab === 1 && (
-          <div className="mt-4">
-            <Card className="shadow-lg">
-              <CardContent>
-                <TableContainer component={Paper} className="shadow-md">
-                  <Table>
-                    <TableHead className="bg-gray-50">
-                      <TableRow>
-                        <TableCell className="font-bold">Order ID</TableCell>
-                        <TableCell className="font-bold">Customer</TableCell>
-                        <TableCell className="font-bold">Date</TableCell>
-                        <TableCell className="font-bold">Items</TableCell>
-                        <TableCell className="font-bold">Total</TableCell>
-                        <TableCell className="font-bold">Status</TableCell>
-                        <TableCell className="font-bold">Actions</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {orders.map((order) => (
-                        <TableRow 
-                          key={order.id}
-                          className="hover:bg-gray-50 transition-colors"
-                        >
-                          <TableCell className="font-medium">{order.id}</TableCell>
-                          <TableCell>{order.customer}</TableCell>
-                          <TableCell>{order.date}</TableCell>
-                          <TableCell>{order.items.length} items</TableCell>
-                          <TableCell className="font-medium">${order.total}</TableCell>
-                          <TableCell>
-                            <Chip
-                              label={order.status}
-                              size="small"
-                              className={
-                                order.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                                'bg-orange-100 text-orange-700'
-                              }
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              size="small"
-                              variant="contained"
-                              startIcon={<Print />}
-                              onClick={() => generateBill(order)}
-                              className="bg-blue-600 hover:bg-blue-700"
-                            >
-                              Generate Bill
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </CardContent>
-            </Card>
+          <div>
+            <TableContainer component={Paper} className="shadow-lg">
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Order ID</TableCell>
+                    <TableCell>Customer</TableCell>
+                    <TableCell>Date</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Total</TableCell>
+                    <TableCell>Payment Method</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {orders.map(order => (
+                    <TableRow key={order.id}>
+                      <TableCell>{order.id}</TableCell>
+                      <TableCell>{order.customer}</TableCell>
+                      <TableCell>{order.date}</TableCell>
+                      <TableCell>{order.status}</TableCell>
+                      <TableCell>${order.total.toFixed(2)}</TableCell>
+                      <TableCell>{order.paymentMethod}</TableCell>
+                      <TableCell>
+                        <Button variant="outlined" color="primary" onClick={() => generateBill(order)}>
+                          Generate Bill
+                        </Button>
+                      </TableCell>
+
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </div>
         )}
 
-        {/* Add Product Dialog */}
-        <Dialog 
-          open={openAddProduct} 
-          onClose={() => setOpenAddProduct(false)}
-          maxWidth="sm"
-          fullWidth
-        >
-          <DialogTitle className="bg-gray-50 flex justify-between items-center">
-            <Typography variant="h6" className="font-bold">Add New Product</Typography>
-            <IconButton onClick={() => setOpenAddProduct(false)}>
-              <Close />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent className="mt-4">
-            <div className="space-y-4">
-              <TextField
-                fullWidth
-                label="Product Name"
-                variant="outlined"
-                className="bg-white"
-              />
-              <TextField
-                fullWidth
-                label="Category"
-                variant="outlined"
-                className="bg-white"
-              />
-              <TextField
-                fullWidth
-                label="Stock Quantity"
-                type="number"
-                variant="outlined"
-                className="bg-white"
-              />
-              <TextField
-                fullWidth
-                label="Price"
-                type="number"
-                variant="outlined"
-                className="bg-white"
-              />
-            </div>
-          </DialogContent>
-          <DialogActions className="p-4">
-            <Button 
-              onClick={() => setOpenAddProduct(false)}
-              className="text-gray-600"
-            >
-              Cancel
+        {/* Dialog for Adding New Product */}
+        <Dialog open={openAddProduct} onClose={() => setOpenAddProduct(false)}>
+        <DialogTitle>Add New Product</DialogTitle>
+        <DialogContent>
+            <TextField
+            label="Product Name"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={newProduct.name}
+            onChange={handleNewProductChange('name')}
+            />
+            <TextField
+            label="Stock"
+            type="number"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={newProduct.stock}
+            onChange={handleNewProductChange('stock')}
+            />
+            <TextField
+            label="Price"
+            type="number"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={newProduct.price}
+            onChange={handleNewProductChange('price')}
+            />
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={() => setOpenAddProduct(false)} color="secondary">
+            Cancel
             </Button>
-            <Button 
-              variant="contained" 
-              onClick={() => setOpenAddProduct(false)}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Save Product
+            <Button onClick={handleAddProduct} color="primary">
+            Add Product
             </Button>
-          </DialogActions>
+        </DialogActions>
         </Dialog>
 
-        {/* Bill Generation Dialog */}
-        <Dialog 
-          open={showBillDialog} 
-          onClose={() => setShowBillDialog(false)}
-          maxWidth="md"
-          fullWidth
-        >
-          <DialogTitle className="bg-gray-50 flex justify-between items-center">
-            <Typography variant="h6" className="font-bold">Order Bill</Typography>
-            <IconButton onClick={() => setShowBillDialog(false)}>
-              <Close />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent>
-            {selectedOrder && (
-              <div className="p-6" ref={billRef}>
-                <div className="text-center mb-8">
-                  <div className="flex items-center justify-center mb-2">
-                    <LocalPharmacy className="text-4xl text-blue-600 mr-2" />
-                    <Typography variant="h4" className="font-bold text-gray-700">
-                      Pharmacy Name
-                    </Typography>
-                  </div>
-                  <Typography variant="subtitle1" className="text-gray-500">
-                    Order Summary for {selectedOrder.customer}
-                  </Typography>
-                </div>
-                <div className="mb-4">
-                  <Typography variant="h6" className="font-semibold text-gray-700">
-                    Order Details
-                  </Typography>
-                  <div className="mt-2 border-t border-gray-200 pt-2">
-                    <Typography variant="body2" className="text-gray-500">
-                      Order ID: <span className="font-medium text-gray-700">{selectedOrder.id}</span>
-                    </Typography>
-                    <Typography variant="body2" className="text-gray-500">
-                      Order Date: <span className="font-medium text-gray-700">{selectedOrder.date}</span>
-                    </Typography>
-                    <Typography variant="body2" className="text-gray-500">
-                      Payment Method: <span className="font-medium text-gray-700">{selectedOrder.paymentMethod}</span>
-                    </Typography>
-                  </div>
-                </div>
-                <div className="mb-4">
-                  <Typography variant="h6" className="font-semibold text-gray-700">
-                    Items
-                  </Typography>
-                  <TableContainer component={Paper} className="mt-2">
-                    <Table>
-                      <TableHead className="bg-gray-100">
-                        <TableRow>
-                          <TableCell className="font-bold">Name</TableCell>
-                          <TableCell className="font-bold">Quantity</TableCell>
-                          <TableCell className="font-bold">Price</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {selectedOrder.items.map((item, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{item.name}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-                            <TableCell>${item.price}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </div>
-                <div className="text-right">
-                  <Typography variant="h6" className="font-semibold text-gray-700">
-                    Total: ${selectedOrder.total}
-                  </Typography>
-                </div>
-              </div>
-            )}
+        {/* Dialog for Editing Product */}
+        <Dialog open={openEditProduct} onClose={() => setOpenEditProduct(false)}>
+<DialogTitle>Edit Product</DialogTitle>
+<DialogContent>
+    {editingProduct && (
+    <>
+        <TextField
+        label="Product Name"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={editingProduct.name}
+        onChange={handleEditProductChange('name')}
+        />
+        <TextField
+        label="Stock"
+        type="number"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={editingProduct.stock}
+        onChange={handleEditProductChange('stock')}
+        />
+        <TextField
+        label="Price"
+        type="number"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={editingProduct.price}
+        onChange={handleEditProductChange('price')}
+        />
+    </>
+    )}
+</DialogContent>
+<DialogActions>
+    <Button onClick={() => setOpenEditProduct(false)} color="secondary">
+    Cancel
+    </Button>
+    <Button onClick={handleEditProduct} color="primary">
+    Update Product
+    </Button>
+</DialogActions>
+</Dialog>
+
+        {/* Dialog for Viewing and Downloading Bill */}
+        <Dialog open={showBillDialog} onClose={() => setShowBillDialog(false)}>
+          <DialogTitle>Bill for Order {selectedOrder && selectedOrder.id}</DialogTitle>
+          <DialogContent ref={billRef}>
+            <Typography variant="h6">Customer: {selectedOrder && selectedOrder.customer}</Typography>
+            <Typography variant="subtitle1">Date: {selectedOrder && selectedOrder.date}</Typography>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Item</TableCell>
+                  <TableCell>Quantity</TableCell>
+                  <TableCell>Price</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {selectedOrder && selectedOrder.items.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>${item.price.toFixed(2)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <Typography variant="h6">Total: ${selectedOrder && selectedOrder.total.toFixed(2)}</Typography>
           </DialogContent>
-          <DialogActions className="p-4">
-            <Button 
-              onClick={() => setShowBillDialog(false)}
-              className="text-gray-600"
-            >
-              Cancel
+          <DialogActions>
+            <Button onClick={downloadPDF} color="primary">
+              Download Bill
             </Button>
-            <Button 
-              variant="contained" 
-              onClick={downloadPDF}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Download PDF
+            <Button onClick={() => setShowBillDialog(false)} color="secondary">
+              Close
             </Button>
           </DialogActions>
         </Dialog>
