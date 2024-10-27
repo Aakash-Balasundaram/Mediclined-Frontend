@@ -8,9 +8,10 @@ import { MedicalLeaveSection } from "./components/MedicalLeaveSection";
 import { AlertSection } from "./components/AlertSection";
 import WaitingQueue from "./components/WaitingQueue";
 import { v4 as uuidv4 } from "uuid";
-import { STUDENT_URL, CLINIC_URL, PHARMACY_URL } from "../constants";
+import { STUDENT_URL, CLINIC_URL, PHARMACY_URL, MONGO_URL } from "../constants";
 import secureLocalStorage from "react-secure-storage";
 import { useRouter } from "next/navigation";
+import { Switch } from "@mui/material";
 
 const ClinicDashboard = () => {
   const router = useRouter();
@@ -27,6 +28,7 @@ const ClinicDashboard = () => {
     temperature: "",
     knownAllergies: "No",
   });
+  const [switchValue, setSwitchValue] = useState(false);
 
   // Medical Leave State
   const [leaveData, setLeaveData] = useState({
@@ -48,7 +50,7 @@ const ClinicDashboard = () => {
 
   useEffect(() => {
     const role = secureLocalStorage.getItem("role");
-    if(role!="C") {
+    if (role != "C") {
       router.push("/403");
     }
     const storedClinicID = secureLocalStorage.getItem("userId");
@@ -116,47 +118,97 @@ const ClinicDashboard = () => {
   };
 
   const handleFetchStudentDetails = async () => {
-    if (!formData.rollNo.trim()) {
-      setError((prev) => ({
-        ...prev,
-        studentDetails: "Please enter a roll number",
-      }));
-      return;
-    }
-
-    try {
-      console.log("Fetching student details..."); // Confirm the function is triggered
-
-      const response = await axios.get(STUDENT_URL + "/rollno", {
-        params: { rollNo: formData.rollNo },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("Response MSG data:", response.data.MSG[0]); // Log the response
-
-      if (response.status === 200) {
-        const { Email, Name, Age, Gender } = response.data.MSG[0];
-
-        // Map response fields to formData fields
-        setFormData((prev) => ({
-          ...prev,
-          email: Email, // Backend "Email" -> form "email"
-          name: Name, // Backend "Name" -> form "name"
-          age: Age, // Backend "Age" -> form "age"
-          gender: Gender, // Backend "Gender" -> form "gender"
-        }));
-      } else {
+    if (switchValue == false) {
+      if (!formData.rollNo.trim()) {
         setError((prev) => ({
           ...prev,
-          studentDetails:
-            response.data.ERR || "Failed to fetch student details",
+          studentDetails: "Please enter a roll number",
+        }));
+        return;
+      }
+
+      try {
+        console.log("Fetching student details..."); // Confirm the function is triggered
+
+        const response = await axios.get(STUDENT_URL + "/rollno", {
+          params: { rollNo: formData.rollNo },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Response MSG data:", response.data.MSG[0]); // Log the response
+
+        if (response.status === 200) {
+          const { Email, Name, Age, Gender, Roll_number } =
+            response.data.MSG[0];
+
+          // Map response fields to formData fields
+          setFormData((prev) => ({
+            ...prev,
+            email: Email, // Backend "Email" -> form "email"
+            name: Name, // Backend "Name" -> form "name"
+            age: Age, // Backend "Age" -> form "age"
+            gender: Gender === 1 ? "male" : "female", // Backend "Gender" -> form "gender"
+            rollNo: Roll_number,
+          }));
+        } else {
+          setError((prev) => ({
+            ...prev,
+            studentDetails:
+              response.data.ERR || "Failed to fetch student details",
+          }));
+        }
+      } catch (error) {
+        console.error("API Error:", error); // Log error details
+        setError((prev) => ({
+          ...prev,
+          studentDetails: "Failed to fetch student details",
         }));
       }
-    } catch (error) {
-      console.error("API Error:", error); // Log error details
-      setError((prev) => ({
-        ...prev,
-        studentDetails: "Failed to fetch student details",
-      }));
+    } else {
+      if (!formData.email.trim()) {
+        setError((prev) => ({
+          ...prev,
+          studentDetails: "Please enter a email",
+        }));
+        return;
+      }
+
+      try {
+        const response = await axios.get(STUDENT_URL, {
+          params: { email: formData.email },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Response MSG data:", response.data.MSG[0]); // Log the response
+
+        if (response.status === 200) {
+          const { Email, Name, Age, Gender, Roll_number } =
+            response.data.MSG[0];
+
+          // Map response fields to formData fields
+          setFormData((prev) => ({
+            ...prev,
+            email: Email, // Backend "Email" -> form "email"
+            name: Name, // Backend "Name" -> form "name"
+            age: Age, // Backend "Age" -> form "age"
+            gender: Gender, // Backend "Gender" -> form "gender"
+            rollNo: Roll_number,
+          }));
+          if (Name == null || Roll_number == null) {
+            window.alert("Data fetched, but empty, try updating");
+          }
+        } else {
+          setError((prev) => ({
+            ...prev,
+            studentDetails:
+              response.data.ERR || "Failed to fetch student details",
+          }));
+        }
+      } catch (error) {
+        console.error("API Error:", error); // Log error details
+        setError((prev) => ({
+          ...prev,
+          studentDetails: "Failed to fetch student details",
+        }));
+      }
     }
   };
 
@@ -166,9 +218,6 @@ const ClinicDashboard = () => {
         params: { clinicID: clinicID, email: email }, // Pass both clinicID and student email
         headers: { Authorization: `Bearer ${token}` },
       });
-      setPatientQueue((prev) =>
-        prev.filter((patient) => patient.email !== email)
-      );
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setError((prev) => ({
@@ -182,6 +231,7 @@ const ClinicDashboard = () => {
         }));
       }
     }
+    fetchQueue(clinicID);
   };
 
   const handleCheckIn = async () => {
@@ -206,7 +256,15 @@ const ClinicDashboard = () => {
         },
         { headers: { Authorization: `Bearer ${token}` } } // Clinic authorization
       );
-      setPatientQueue((prev) => [...prev, response.data.MSG[0]]); // Assuming response contains new student details
+      fetchQueue(clinicID) // Assuming response contains new student details
+
+      const res = await axios.post(MONGO_URL+"/critical", {
+        email: formData.email,
+        deviceData: {
+          temperature: formData.temperature,
+          bloodPressure: formData.bloodPressure,
+        },
+      });
 
       // Reset form after successful addition
       setFormData({
@@ -281,6 +339,29 @@ const ClinicDashboard = () => {
     }
   };
 
+  const handleStudentDetailsUpdate = async () => {
+    const res = await axios.put(
+      STUDENT_URL,
+      {
+        email: formData.email,
+        name: formData.name,
+        age: formData.age,
+        gender: formData.gender == "male" ? 0 : 1,
+        bloodGroup: "",
+        rollNo: formData.rollNo,
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    try {
+      if (res.status == 200) {
+        console.log("Updation successful!");
+        handleFetchStudentDetails();
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleGenerateLeave = async () => {
     if (
       !leaveData.rollNo.trim() ||
@@ -328,21 +409,33 @@ const ClinicDashboard = () => {
               {/* Main Content Area */}
               <div className="flex-1">
                 <div className="bg-white rounded-lg shadow-sm p-4 h-[calc(100vh-17rem)]">
-                  <h2 className="font-semibold text-gray-800 mb-4">
-                    Patient/Student Details
-                  </h2>
+                  <div className="flex flex-row gap-10">
+                    <h2 className="font-semibold text-gray-800 mb-4">
+                      Patient/Student Details
+                    </h2>
+                    <div>
+                      Roll number
+                      <Switch
+                        value={switchValue}
+                        onChange={(e) => setSwitchValue(e.target.checked)}
+                      />
+                      Email
+                    </div>
+                  </div>
                   <div className="grid grid-cols-2 gap-4">
                     <StudentDetailsForm
                       formData={formData}
                       error={error.studentDetails}
                       onInputChange={handleStudentFormChange}
                       onFetchDetails={handleFetchStudentDetails}
+                      switchValue={switchValue}
                     />
 
                     <VitalsSection
                       formData={formData}
                       onChange={handleStudentFormChange}
                       onCheckIn={handleCheckIn}
+                      onUpdate={handleStudentDetailsUpdate}
                     />
                   </div>
                 </div>
