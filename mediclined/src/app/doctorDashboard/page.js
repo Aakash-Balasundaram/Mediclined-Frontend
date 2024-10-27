@@ -5,6 +5,7 @@ import PrescriptionItem from "./components/PrescriptionItem";
 import Tests from "./components/TestComponent";
 import PatientData from "./components/PatientData";
 import WaitingQueue from "./components/WaitingQueue";
+import Head from "../header";
 
 import {
   MEDICINE_API_URL,
@@ -238,15 +239,9 @@ function App() {
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       {/* Header Section */}
-      <header className="flex items-center p-4 bg-white shadow-md">
-        <img
-          src="/mediclined_logo-modified.png"
-          alt="Logo"
-          className="h-8 w-auto mr-2"
-        />
-        <h1 className="text-xl font-bold">MEDICLINED</h1>
-      </header>
-
+      <div>
+        <Head />
+      </div>
       <div className="flex flex-grow overflow-auto">
         {/* Diagnosis and Prescription Container */}
         <div className="flex flex-col flex-1 p-4 space-y-4">
