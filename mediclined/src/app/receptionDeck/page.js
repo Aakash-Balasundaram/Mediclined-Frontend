@@ -8,7 +8,7 @@ import { MedicalLeaveSection } from "./components/MedicalLeaveSection";
 import { AlertSection } from "./components/AlertSection";
 import WaitingQueue from "./components/WaitingQueue";
 import { v4 as uuidv4 } from "uuid";
-import { STUDENT_URL, CLINIC_URL, PHARMACY_URL } from "../constants";
+import { STUDENT_URL, CLINIC_URL, PHARMACY_URL, MONGO_URL } from "../constants";
 import secureLocalStorage from "react-secure-storage";
 import { useRouter } from "next/navigation";
 import { Switch } from "@mui/material";
@@ -137,7 +137,8 @@ const ClinicDashboard = () => {
         console.log("Response MSG data:", response.data.MSG[0]); // Log the response
 
         if (response.status === 200) {
-          const { Email, Name, Age, Gender, Roll_number } = response.data.MSG[0];
+          const { Email, Name, Age, Gender, Roll_number } =
+            response.data.MSG[0];
 
           // Map response fields to formData fields
           setFormData((prev) => ({
@@ -145,8 +146,8 @@ const ClinicDashboard = () => {
             email: Email, // Backend "Email" -> form "email"
             name: Name, // Backend "Name" -> form "name"
             age: Age, // Backend "Age" -> form "age"
-            gender: Gender===1?"male":"female", // Backend "Gender" -> form "gender"
-            rollNo: Roll_number
+            gender: Gender === 1 ? "male" : "female", // Backend "Gender" -> form "gender"
+            rollNo: Roll_number,
           }));
         } else {
           setError((prev) => ({
@@ -191,8 +192,8 @@ const ClinicDashboard = () => {
             gender: Gender, // Backend "Gender" -> form "gender"
             rollNo: Roll_number,
           }));
-          if(Name==null || Roll_number == null) {
-            window.alert("Data fetched, but empty, try updating")
+          if (Name == null || Roll_number == null) {
+            window.alert("Data fetched, but empty, try updating");
           }
         } else {
           setError((prev) => ({
@@ -217,9 +218,6 @@ const ClinicDashboard = () => {
         params: { clinicID: clinicID, email: email }, // Pass both clinicID and student email
         headers: { Authorization: `Bearer ${token}` },
       });
-      setPatientQueue((prev) =>
-        prev.filter((patient) => patient.email !== email)
-      );
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setError((prev) => ({
@@ -233,6 +231,7 @@ const ClinicDashboard = () => {
         }));
       }
     }
+    fetchQueue(clinicID);
   };
 
   const handleCheckIn = async () => {
@@ -257,7 +256,15 @@ const ClinicDashboard = () => {
         },
         { headers: { Authorization: `Bearer ${token}` } } // Clinic authorization
       );
-      setPatientQueue((prev) => [...prev, response.data.MSG[0]]); // Assuming response contains new student details
+      fetchQueue(clinicID) // Assuming response contains new student details
+
+      const res = await axios.post(MONGO_URL+"/critical", {
+        email: formData.email,
+        deviceData: {
+          temperature: formData.temperature,
+          bloodPressure: formData.bloodPressure,
+        },
+      });
 
       // Reset form after successful addition
       setFormData({
@@ -339,9 +346,9 @@ const ClinicDashboard = () => {
         email: formData.email,
         name: formData.name,
         age: formData.age,
-        gender: formData.gender=="male"?0:1,
+        gender: formData.gender == "male" ? 0 : 1,
         bloodGroup: "",
-        rollNo: formData.rollNo
+        rollNo: formData.rollNo,
       },
       { headers: { Authorization: `Bearer ${token}` } }
     );
