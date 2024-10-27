@@ -1,3 +1,22 @@
+# Table of Contents
+
+1. [Mediclined 🏥](#mediclined-)
+2. [Project Description](#project-description)
+3. [Technologies Used 🌟](#-technologies-used)
+4. [Project Overview 📝](#-project-overview)
+   - [Core Features](#core-features)
+   - [System Architecture](#system-architecture)
+   - [Key Assumptions](#key-assumptions)
+5. [API References 🌐](#-api-references)
+6. [Installation and Setup ⚙️](#-installation-and-setup)
+   - [Backend Setup](#backend-setup)
+   - [Frontend Setup](#frontend-setup)
+7. [Future Scope 🔮](#-future-scope)
+8. [Contributing 🤝](#-contributing)
+9. [License 📄](#-license)
+
+---
+
 # Mediclined 🏥
 
 **Project Description:**  
@@ -132,9 +151,6 @@ Mediclined is a comprehensive web application designed to streamline the relatio
 
 ## 🤝 Contributing
 We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-## 📄 License
-This project is licensed under the [MIT License](LICENSE).
 
 ---
 
