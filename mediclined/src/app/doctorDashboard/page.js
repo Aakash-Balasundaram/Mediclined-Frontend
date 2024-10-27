@@ -6,20 +6,53 @@ import Tests from "./components/TestComponent";
 import PatientData from "./components/PatientData";
 import WaitingQueue from "./components/WaitingQueue";
 
-import { MEDICINE_API_URL } from "../constants";
+import { MEDICINE_API_URL, PHARMACY_URL, STUDENT_URL } from "../constants";
 import axios from "axios";
+import secureLocalStorage from "react-secure-storage";
+import { useRouter } from "next/navigation";
 
 function App() {
+  const router = useRouter();
   const [diagnosis, setDiagnosis] = useState("");
   const [tests, setTests] = useState([]);
   const [medicines, setMedicines] = useState([]);
 
   // Patient queue state
-  const [patientQueue, setPatientQueue] = useState([
-    { id: 1, name: "John Doe", age: 28, gender: "Male" },
-    { id: 2, name: "Jane Smith", age: 34, gender: "Female" },
-    { id: 3, name: "Mike Johnson", age: 45, gender: "Male" },
-  ]);
+  const [patientQueue, setPatientQueue] = useState([]);
+
+  const [patientInfo, setPatientInfo] = useState({
+    Name: "",
+    Email: "",
+    Age: "",
+    Gender: "",
+    Blood_Group: "",
+    Roll_number: "",
+  });
+
+  useEffect(() => {
+    const role = secureLocalStorage.getItem("role");
+    if (role != "D") {
+      router.push("/403");
+    }
+    fetchQueue();
+  }, []);
+
+  //function to fetch queue
+  const fetchQueue = async () => {
+    const token = secureLocalStorage.getItem("token");
+    const ClinicID = secureLocalStorage.getItem("ClinicID");
+    const res = await axios.get(PHARMACY_URL + `/queue?clinicID=${ClinicID}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (res.status == 200) {
+      console.log(res.data.MSG);
+      setPatientQueue(res.data.MSG);
+    } else {
+      console.log(res.body);
+    }
+  };
 
   // Function to handle patient rejection
   const handleReject = (id) => {
@@ -126,6 +159,21 @@ function App() {
     console.log(selectedMedicines);
   }, [selectedMedicines]);
 
+  const handleStudentApprove = async (email) => {
+    const token = secureLocalStorage.getItem("token");
+    const res = await axios.get(STUDENT_URL + `?email=${email}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (res.status == 200) {
+      console.log(res.data.MSG);
+      setPatientInfo(res.data.MSG[0]);
+    } else {
+      console.log(res.body);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       {/* Header Section */}
@@ -190,14 +238,18 @@ function App() {
             </div>
           </div>
           {/* Waiting Queue Section */}
-          <WaitingQueue patientQueue={patientQueue} onReject={handleReject} />
+          <WaitingQueue
+            patientQueue={patientQueue}
+            onReject={handleReject}
+            handleApprove={handleStudentApprove}
+          />
         </div>
 
         {/* Patient Information */}
         <div className="bg-white shadow-md p-4 rounded-lg w-1/4 h-full mt-4 mr-4 mb-4 overflow-y-auto max-h-[calc(100vh-98px)] flex-shrink-0">
           <h4 className="font-bold mb-4">PATIENT INFORMATION</h4>
           <PatientData
-            patientDetails={patientData.details}
+            patientDetails={patientInfo}
             patientInfo={patientData.info}
             previousTests={patientData.tests}
             medicalHistory={patientData.history}
