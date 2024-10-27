@@ -20,13 +20,12 @@ export default function AdminHome() {
 
   return (
     <div className="flex flex-col h-full w-full">
-      <div className="flex flex-row m-4 items-center w-[296px] justify-between">
-          <Head />
+      <div className="flex flex-row m-4 items-center w-full justify-between">
+        <Head />
       </div>
       <div className="flex items-center justify-center">
-          <Categories />
+        <Categories />
       </div>
     </div>
   );
-
 }
