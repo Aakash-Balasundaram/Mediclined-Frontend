@@ -1,115 +1,182 @@
-import { TextField, Button, MenuItem } from "@mui/material";
+"use client";
+import { useState } from "react";
+import {
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 
 export const MedicalLeaveSection = ({
   leaveData,
   error,
-  mockPrescriptions,
   onInputChange,
-  onFetchPrescriptions,
-  onGenerateLeave,
+  setLeaveData,
 }) => {
+  const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchPrescriptions = async () => {
+    if (
+      !leaveData.rollNo.trim() ||
+      !leaveData.startDate ||
+      !leaveData.endDate
+    ) {
+      console.log("Some fields are empty!")
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        MONGO_URL +
+          `/rollNo/${leaveData.rollNo}?startDate=${leaveData.startDate}&endDate=${leaveData.endDate}`
+      );
+
+      if (response.status === 200) {
+        console.log("Prescriptions fetched successfully!");
+
+        // Update the mockPrescriptions state with the fetched data
+        setPrescriptions(response.data);
+
+        setError((prev) => ({ ...prev, leaveDetails: "" }));
+        setLeaveData({
+          rollNo: "",
+          startDate: "",
+          endDate: "",
+          selectedPrescription: "", // Reset selectedPrescription
+        });
+      } else {
+        console.error("Failed to fetch prescriptions:", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching prescriptions:", error);
+    }
+  };
+
+  const generateReport = async () => {
+    if (!selectedPrescription) {
+      alert("Please select a prescription first.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Simulate PDF generation
+      const pdfContent = await generatePDF(selectedPrescription);
+      const blob = new Blob([pdfContent], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `report_${selectedPrescription.id}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error generating report:", error);
+      alert("Failed to generate report.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 w-full">
-      <h3 className="text-sm font-medium text-gray-600 mb-4">
-        Generate Medical Leave
-      </h3>
-      <div className="space-y-4">
-        <div className="flex items-end space-x-2">
-          <div className="flex-1">
-            <TextField
-              fullWidth
-              label="Roll Number"
-              name="rollNo"
-              value={leaveData.rollNo}
-              onChange={onInputChange}
-              error={!!error}
-              helperText={error}
-              placeholder="Enter Roll No"
-              size="small"
-            />
-          </div>
-          <div>
-            <Button
-              variant="contained"
-              onClick={onFetchPrescriptions}
-              size="medium"
-              sx={{
-                bgcolor: "grey.100",
-                color: "grey.700",
-                "&:hover": { bgcolor: "grey.200" },
-                minWidth: "80px",
-              }}
-            >
-              Fetch
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <TextField
-              fullWidth
-              label="Start Date"
-              name="startDate"
-              type="date"
-              value={leaveData.startDate}
-              onChange={onInputChange}
-              size="small"
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </div>
-          <div>
-            <TextField
-              fullWidth
-              label="End Date"
-              name="endDate"
-              type="date"
-              value={leaveData.endDate}
-              onChange={onInputChange}
-              size="small"
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </div>
-          <div>
-            <TextField
-              fullWidth
-              select
-              label="Select Previous Prescription"
-              name="selectedPrescription"
-              value={leaveData.selectedPrescription}
-              onChange={onInputChange}
-              size="small"
-            >
-              <MenuItem value="" disabled>
-                Select a prescription
-              </MenuItem>
-              {mockPrescriptions.map((p) => (
-                <MenuItem key={p.id} value={p.id}>
-                  {`${p.date} - ${p.diagnosis}`}
-                </MenuItem>
-              ))}
-            </TextField>
-          </div>
-        </div>
-
-        <Button
-          onClick={onGenerateLeave}
+    <div style={{ padding: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "16px",
+          flexDirection: "column",
+          maxWidth: "400px",
+        }}
+      >
+        <TextField
+          label="Roll Number"
+          variant="outlined"
+          name="rollNo"
+          value={leaveData.rollNo}
+          onChange={onInputChange}
           fullWidth
+        />
+        <TextField
+          label="Start Date"
+          variant="outlined"
+          type="date"
+          name="startDate"
+          value={leaveData.startDate}
+          onChange={onInputChange}
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+        />
+        <TextField
+          label="End Date"
+          variant="outlined"
+          type="date"
+          name="endDate"
+          value={leaveData.endDate}
+          onChange={onInputChange}
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+        />
+        <Button
           variant="contained"
-          sx={{
-            bgcolor: "primary.main",
-            color: "white",
-            "&:hover": { bgcolor: "primary.dark" },
-            py: 1,
-          }}
+          color="primary"
+          disabled={isLoading || !leaveData.rollNo}
         >
-          Generate Leave
+          {isLoading ? "Generating..." : "Submit Leave Request"}
         </Button>
       </div>
+
+      <div style={{ marginTop: "20px" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={fetchPrescriptions}
+          disabled={isLoading}
+        >
+          {isLoading ? "Fetching..." : "Fetch Prescriptions"}
+        </Button>
+      </div>
+
+      {prescriptions.length > 0 && (
+        <div style={{ marginTop: "20px" }}>
+          <Typography variant="h6">Select a Prescription:</Typography>
+          <List>
+            {prescriptions.map((prescription) => (
+              <ListItem
+                key={prescription.id}
+                button
+                onClick={() => setSelectedPrescription(prescription)}
+              >
+                <ListItemText
+                  primary={`${prescription.date}: ${prescription.diagnosis}`}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </div>
+      )}
+
+      {selectedPrescription && (
+        <div style={{ marginTop: "20px" }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={generateReport}
+            disabled={isLoading}
+          >
+            Generate Report
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
+
+function generatePDF(prescription) {
+  // Implement your PDF generation logic here
+  // This is just a placeholder - you'll need to implement the actual PDF generation
+  console.log(`Generating PDF for prescription ${prescription.id}`);
+  return "PDF content"; // Return the actual PDF content
+}

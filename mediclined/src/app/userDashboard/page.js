@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Avatar,
   Card,
@@ -25,7 +25,8 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import Head from "../header";
 import axios from "axios";
 import MedicineSearch from "./components/MedicineSearch";
-import { MEDICINE_API_URL } from "../constants";
+import { MEDICINE_API_URL, STUDENT_URL } from "../constants";
+import secureLocalStorage from "react-secure-storage";
 
 export const getInitials = (name) => {
   if (!name) return "";
@@ -37,37 +38,222 @@ export const getInitials = (name) => {
 };
 
 const ProfileCard = ({ name, id }) => {
+  const [studentDetails, setStudentDetails] = useState({
+    Email: "",
+    Name: "",
+    Age: "",
+    Gender: "",
+    Blood_Group: "",
+    Roll_number: "",
+    Address: "",
+  });
+
+  const [editMode, setEditMode] = useState(false);
+  const [editedDetails, setEditedDetails] = useState({});
+
+  const getDetails = async () => {
+    const email = secureLocalStorage.getItem("email");
+    const token = secureLocalStorage.getItem("token");
+    const response = await axios.get(`${STUDENT_URL}?email=${email}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Assuming Bearer token
+      },
+    });
+    if (response.status >= 200 && response.status < 300) {
+      console.log(response.data.MSG);
+      setStudentDetails(response.data.MSG[0]);
+    }
+  };
+
+  useEffect(() => {
+    getDetails();
+  }, []);
+
+  const toggleEditMode = () => {
+    setEditMode(!editMode);
+    if (!editMode) {
+      setEditedDetails(studentDetails);
+    } else {
+      setStudentDetails(editedDetails);
+    }
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setEditedDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+  };
+
+  const saveChanges = async () => {
+    try {
+      const updatedDetails = Object.entries(editedDetails).reduce(
+        (acc, [key, value]) => {
+          if (value !== "") acc[key] = value;
+          return acc;
+        },
+        {}
+      );
+
+      const response = await axios.put(`${STUDENT_URL}`, updatedDetails, {
+        headers: {
+          Authorization: `Bearer ${secureLocalStorage.getItem("token")}`,
+        },
+      });
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log("Profile updated successfully");
+        // Update local storage if needed
+        secureLocalStorage.setItem(
+          "email",
+          editedDetails.Email || studentDetails.Email
+        );
+        toggleEditMode();
+      } else {
+        throw new Error(`Failed to update profile: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error.message);
+    }
+  };
+
   return (
     <Card className="p-6">
-      <div className="flex flex-col items-center mb-6">
-        <Avatar
-          sx={{
-            width: 100,
-            height: 100,
-            fontSize: "2rem",
-            bgcolor: "#1976d2",
-            marginBottom: "1rem",
-          }}
-        >
-          {getInitials(name)}
-        </Avatar>
-        <h3 className="text-xl font-semibold">{name}</h3>
-        <p className="text-sm text-gray-500">ID: {id}</p>
-      </div>
+      {editMode ? (
+        <div>
+          <TextField
+            label="Email"
+            name="Email"
+            value={editedDetails.Email}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+          />
+
+          <TextField
+            label="Name"
+            name="Name"
+            value={editedDetails.Name}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+          />
+
+          <TextField
+            label="Age"
+            name="Age"
+            value={editedDetails.Age}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+          />
+
+          <FormControl fullWidth margin="normal" variant="outlined">
+            <InputLabel>Gender</InputLabel>
+            <Select
+              value={editedDetails.Gender || ""}
+              onChange={(event) =>
+                handleInputChange({
+                  target: { name: "Gender", value: event.target.value },
+                })
+              }
+              label="Gender"
+            >
+              <MenuItem value="">Select Gender</MenuItem>
+              <MenuItem value="Male">Male</MenuItem>
+              <MenuItem value="Female">Female</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
+            </Select>
+          </FormControl>
+
+          <TextField
+            label="Blood Group"
+            name="Blood_Group"
+            value={editedDetails.Blood_Group || ""}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+          />
+
+          <TextField
+            label="Roll Number"
+            name="Roll_number"
+            value={editedDetails.Roll_number}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+          />
+
+          <TextField
+            label="Address"
+            name="Address"
+            value={editedDetails.Address}
+            onChange={handleInputChange}
+            fullWidth
+            multiline
+            rows={3}
+            margin="normal"
+            variant="outlined"
+          />
+
+          <Button
+            onClick={saveChanges}
+            variant="contained"
+            color="primary"
+            fullWidth
+          >
+            Save Changes
+          </Button>
+          <Button onClick={toggleEditMode} variant="outlined" fullWidth>
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center mb-6">
+          <Avatar
+            sx={{
+              width: 100,
+              height: 100,
+              fontSize: "2rem",
+              bgcolor: "#1976d2",
+              marginBottom: "1rem",
+            }}
+          >
+            {getInitials(name)}
+          </Avatar>
+          <h3 className="text-xl font-semibold">{name}</h3>
+          <p className="text-sm text-gray-500">ID: {id}</p>
+        </div>
+      )}
+
       <div className="space-y-3">
         <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
           <span className="text-gray-600">Age</span>
-          <span className="font-medium">32 years</span>
+          <span className="font-medium">
+            {studentDetails.Age || "Not Available"}
+          </span>
         </div>
         <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
           <span className="text-gray-600">Blood Group</span>
-          <span className="font-medium">O+</span>
+          <span className="font-medium">
+            {studentDetails.Blood_Group || "Not Available"}
+          </span>
         </div>
         <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
           <span className="text-gray-600">Weight</span>
           <span className="font-medium">75 kg</span>
         </div>
       </div>
+
+      <IconButton onClick={toggleEditMode}>
+        {editMode ? <DeleteOutlineIcon /> : <FeedbackIcon />}
+      </IconButton>
     </Card>
   );
 };

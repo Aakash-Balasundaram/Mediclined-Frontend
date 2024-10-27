@@ -256,9 +256,9 @@ const ClinicDashboard = () => {
         },
         { headers: { Authorization: `Bearer ${token}` } } // Clinic authorization
       );
-      fetchQueue(clinicID) // Assuming response contains new student details
+      fetchQueue(clinicID); // Assuming response contains new student details
 
-      const res = await axios.post(MONGO_URL+"/critical", {
+      const res = await axios.post(MONGO_URL + "/critical", {
         email: formData.email,
         deviceData: {
           temperature: formData.temperature,
@@ -294,12 +294,8 @@ const ClinicDashboard = () => {
     }
   };
 
-  // Mock Data
-  const mockPrescriptions = [
-    { id: 1, date: "2024-10-20", diagnosis: "Common Cold" },
-    { id: 2, date: "2024-10-15", diagnosis: "Fever" },
-    { id: 3, date: "2024-10-10", diagnosis: "Allergic Reaction" },
-  ];
+  const [mockPrescriptions, setMockPrescriptions] = useState([]);
+  const [selectedPrescription, setSelectedPrescription] = useState("");
 
   // Handler Functions
   const handleStudentFormChange = (e) => {
@@ -318,26 +314,26 @@ const ClinicDashboard = () => {
     }
   };
 
-  const handleFetchPrescriptions = async () => {
-    if (!leaveData.rollNo.trim()) {
-      setError((prev) => ({
-        ...prev,
-        leaveDetails: "Please enter a roll number",
-      }));
-      return;
-    }
+  // const handleFetchPrescriptions = async () => {
+  //   if (!leaveData.rollNo.trim()) {
+  //     setError((prev) => ({
+  //       ...prev,
+  //       leaveDetails: "Please enter a roll number",
+  //     }));
+  //     return;
+  //   }
 
-    try {
-      // Mock API call - replace with actual API call
-      console.log("Fetching prescriptions for:", leaveData.rollNo);
-      // In a real app, you would update the mockPrescriptions state here
-    } catch (error) {
-      setError((prev) => ({
-        ...prev,
-        leaveDetails: "Failed to fetch prescriptions",
-      }));
-    }
-  };
+  //   try {
+  //     // Mock API call - replace with actual API call
+  //     console.log("Fetching prescriptions for:", leaveData.rollNo);
+  //     // In a real app, you would update the mockPrescriptions state here
+  //   } catch (error) {
+  //     setError((prev) => ({
+  //       ...prev,
+  //       leaveDetails: "Failed to fetch prescriptions",
+  //     }));
+  //   }
+  // };
 
   const handleStudentDetailsUpdate = async () => {
     const res = await axios.put(
@@ -362,37 +358,7 @@ const ClinicDashboard = () => {
     }
   };
 
-  const handleGenerateLeave = async () => {
-    if (
-      !leaveData.rollNo.trim() ||
-      !leaveData.startDate ||
-      !leaveData.endDate
-    ) {
-      setError((prev) => ({
-        ...prev,
-        leaveDetails: "Please fill in all required fields",
-      }));
-      return;
-    }
-
-    try {
-      // Mock API call - replace with actual API call
-      console.log("Generating medical leave with data:", leaveData);
-
-      // Reset form after successful submission
-      setLeaveData({
-        rollNo: "",
-        startDate: "",
-        endDate: "",
-        selectedPrescription: "",
-      });
-    } catch (error) {
-      setError((prev) => ({
-        ...prev,
-        leaveDetails: "Failed to generate leave",
-      }));
-    }
-  };
+  
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -458,11 +424,10 @@ const ClinicDashboard = () => {
 
               <MedicalLeaveSection
                 leaveData={leaveData}
+                setLeaveData={setLeaveData}
                 error={error.leaveDetails}
                 mockPrescriptions={mockPrescriptions}
                 onInputChange={handleLeaveFormChange}
-                onFetchPrescriptions={handleFetchPrescriptions}
-                onGenerateLeave={handleGenerateLeave}
               />
             </div>
           </div>
