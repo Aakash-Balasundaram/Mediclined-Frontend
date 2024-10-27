@@ -6,7 +6,12 @@ import Tests from "./components/TestComponent";
 import PatientData from "./components/PatientData";
 import WaitingQueue from "./components/WaitingQueue";
 
-import { MEDICINE_API_URL, PHARMACY_URL, STUDENT_URL } from "../constants";
+import {
+  MEDICINE_API_URL,
+  MONGO_URL,
+  PHARMACY_URL,
+  STUDENT_URL,
+} from "../constants";
 import axios from "axios";
 import secureLocalStorage from "react-secure-storage";
 import { useRouter } from "next/navigation";
@@ -54,11 +59,20 @@ function App() {
     }
   };
 
-  // Function to handle patient rejection
-  const handleReject = (id) => {
-    setPatientQueue((prevQueue) =>
-      prevQueue.filter((patient) => patient.id !== id)
-    );
+  const handleReject = async (email) => {
+    try {
+      await axios.delete(PHARMACY_URL + "/queue", {
+        params: { clinicID: clinicID, email: email }, // Pass both clinicID and student email
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        console.log(error.response.data.ERR);
+      } else {
+        console.log("Failed to remove student from queue");
+      }
+    }
+    fetchQueue();
   };
 
   const [selectedMedicines, setSelectedMedicines] = useState([]);
@@ -123,41 +137,87 @@ function App() {
     ],
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     const checkoutData = {
+      studentEmail: patientInfo.Email,
+      rollNumber: patientInfo.Roll_number,
       diagnosis,
       tests,
       medicines: selectedMedicines.map((m) => ({
         name: m.name,
         dosage: m.dosage,
         timing: m.timing,
-        strengthAndForm: m.strengthAndForm,
+        strengthAndForm: m.selectedStrength,
       })),
     };
     console.log(JSON.stringify(checkoutData, null, 2));
-    alert("Checkout data logged to console.");
+  
+    try {
+      const response = await axios.post(MONGO_URL + "/prescription", checkoutData);
+      
+      if (response.status === 201) {
+        alert("Prescription saved successfully!");
+        
+        // Clear form fields
+        setDiagnosis("");
+        setTests([]);
+        setSelectedMedicines([]);
+        
+        // Clear patient information
+        setPatientInfo({
+          Name: "",
+          Email: "",
+          Age: "",
+          Gender: "",
+          Blood_Group: "",
+          Roll_number: "",
+        });
+        
+        // Refresh the queue
+        fetchQueue();
+        
+        // Remove the processed patient from the queue
+        handleReject(patientInfo.Email);
+      } else {
+        alert("Error saving prescription");
+      }
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      alert("An error occurred while processing the prescription");
+    }
   };
+  
 
   const handleMedicineSelect = (medicineName, strengthAndForm) => {
     const medicineObject = {
-      id: selectedMedicines.length + 1,
       name: medicineName,
       dosage: "",
-      timing: { MN: "", AF: "", NT: "" },
+      timing: {},
       strengthAndForm,
+      selectedStrength: strengthAndForm[0], // Set the first option as default
     };
-    console.log(medicineObject);
+    
     const existingMedicine = selectedMedicines.find(
-      (m) => m.name === medicineName && m.strengthAndForm === strengthAndForm
+      (m) => m.name === medicineName && m.selectedStrength === strengthAndForm[0]
     );
+    
     if (!existingMedicine) {
       setSelectedMedicines((prev) => [...prev, medicineObject]);
     }
   };
+  
 
   useEffect(() => {
     console.log(selectedMedicines);
   }, [selectedMedicines]);
+
+  const handleUpdate = (id, field, value) => {
+    setSelectedMedicines((prevMedicines) =>
+      prevMedicines.map((medicine) =>
+        medicine.id === id ? { ...medicine, [field]: value } : medicine
+      )
+    );
+  };
 
   const handleStudentApprove = async (email) => {
     const token = secureLocalStorage.getItem("token");
@@ -169,6 +229,7 @@ function App() {
     if (res.status == 200) {
       console.log(res.data.MSG);
       setPatientInfo(res.data.MSG[0]);
+      handleReject(email);
     } else {
       console.log(res.body);
     }
@@ -217,13 +278,14 @@ function App() {
                 resetMedicines={resetMedicines}
               />
               <ul className="mt-4 overflow-auto flex-grow">
-                {selectedMedicines.map((m, index) => (
+                {selectedMedicines.map((medicine) => (
                   <PrescriptionItem
-                    key={m.id}
-                    medicineObject={m}
+                    key={medicine.id}
+                    medicineObject={medicine}
+                    onUpdate={handleUpdate}
                     onDelete={() =>
                       setSelectedMedicines((prev) =>
-                        prev.filter((_, i) => i !== index)
+                        prev.filter((m) => m.id !== medicine.id)
                       )
                     }
                   />
