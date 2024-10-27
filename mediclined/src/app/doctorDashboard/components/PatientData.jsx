@@ -17,14 +17,25 @@ const PatientData = ({
     <div className="p-6 bg-gray-100">
       {/* Patient Information Section */}
       <div className="mb-4 bg-white shadow-md p-4 rounded-lg">
-        <p>
-          <strong>Name:</strong> {patientDetails.name}
+      <p>
+          <strong>Email:</strong> {patientDetails.Email}
         </p>
         <p>
-          <strong>Age:</strong> {patientDetails.age}
+          <strong>Name:</strong> {patientDetails.Name}
         </p>
         <p>
-          <strong>Gender:</strong> {patientDetails.gender}
+          <strong>Age:</strong> {patientDetails.Age}
+        </p>
+        <p>
+          <strong>Bloog Group:</strong> {patientDetails.Blood_Group}
+        </p>
+        <p>
+          <strong>Gender:</strong>{" "}
+          {patientDetails.Gender == ""
+            ? ""
+            : patientDetails.Gender == 1
+            ? "Male"
+            : "Female"}
         </p>
       </div>
 

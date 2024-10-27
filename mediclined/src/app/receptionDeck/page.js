@@ -10,8 +10,10 @@ import WaitingQueue from "./components/WaitingQueue";
 import { v4 as uuidv4 } from "uuid";
 import { STUDENT_URL, CLINIC_URL, PHARMACY_URL } from "../constants";
 import secureLocalStorage from "react-secure-storage";
+import { useRouter } from "next/navigation";
 
 const ClinicDashboard = () => {
+  const router = useRouter();
   // Student/Patient Form State
   const [formData, setFormData] = useState({
     rollNo: "",
@@ -45,6 +47,10 @@ const ClinicDashboard = () => {
   });
 
   useEffect(() => {
+    const role = secureLocalStorage.getItem("role");
+    if(role!="C") {
+      router.push("/403");
+    }
     const storedClinicID = secureLocalStorage.getItem("userId");
     const storedToken = secureLocalStorage.getItem("token");
     console.log("Stored Clinic ID:", storedClinicID); // Check what is being retrieved

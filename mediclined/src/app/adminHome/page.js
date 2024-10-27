@@ -10,13 +10,13 @@ import Categories from "./components/categories";
 export default function AdminHome() {
   const router = useRouter();
 
-  // useEffect(() => {
-  //   const role = secureLocalStorage.getItem("role");
-  //   if (role != "A") {
-  //     // navigate to unauthorised page..
-  //     router.push("/403");
-  //   }
-  // }, []);
+  useEffect(() => {
+    const role = secureLocalStorage.getItem("role");
+    if (role != "A") {
+      // navigate to unauthorised page..
+      router.push("/403");
+    }
+  }, []);
 
   return (
     <div className="flex flex-col h-full w-full">
